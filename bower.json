@@ -1,0 +1,23 @@
+{
+  "name": "blogviojs",
+  "version": "0.0.1",
+  "authors": [
+    "Iulian Meghea <iulian.meghea@gmail.com>"
+  ],
+  "main": "lib/sdk.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "bower",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "aye": "git+https://github.com/cburgmer/ayepromise.git#master",
+    "queue-async": "*",
+    "jasmine-ajax": "git+https://github.com/pivotal/jasmine-ajax.git#master",
+    "uxhr": "https://github.com/eighttrackmind/uxhr.git#master"
+  }
+}
