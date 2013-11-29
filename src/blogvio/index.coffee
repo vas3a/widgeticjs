@@ -21,11 +21,6 @@ receiver = (e)->
 	try 
 		receivers[(d = JSON.parse(d)).t]?(d)
 
-chain = (promise)->
-	promise.api = @api
-	promise.login = @login
-	promise
-
 Blogvio = ->
 	win['BlogvioAsyncInit']?()
 	event.on win,'message',receiver
@@ -37,8 +32,8 @@ Blogvio.prototype.init = (client_id,redirect_uri)->
 	auth.setAuthOptions client_id,redirect_uri, @root
 	@
 
-Blogvio.prototype.api 		= ->chain.apply @, [api.apply @, arguments]
-Blogvio.prototype.auth  	= ->chain.apply @, [auth.apply @, arguments]
+Blogvio.prototype.api 		= ->api.apply @, arguments
+Blogvio.prototype.auth  	= ->auth.apply @, arguments
 
 #accessible from outside
 Blogvio.prototype.JSON  	= JSON
