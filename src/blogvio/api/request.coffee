@@ -14,8 +14,7 @@ request = (params)->
 	if (method = method.toUpperCase()) is 'PUT' or method is "DELETE"
 		headers['X-HTTP-Method-Override'] = method
 		method = "POST"
-	if method is "POST"
-		data = json.stringify(data)
+		
 	complete = (response,status)->
 		message.a.t = if status is 200 then 't' else 'f'
 		message.a.d = response
