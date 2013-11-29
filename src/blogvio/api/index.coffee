@@ -13,17 +13,17 @@ link = {}
 
 prepare_message = (url,method,data,id)->
 	url = config.api + url
-
+	access_token = link.tokens?.access_token or false 
 	if (method or= 'GET') instanceof Object
 		data = method
 		method = 'GET'
 
 	if method  isnt 'GET'
-		url = "#{url}?access_token=#{link.tokens.access_token}"
+		url =  url + if access_token then "?access_token=#{access_token}" else ''
 	else
 		data or= {}
-		if link.tokens?.access_token
-			data.access_token = link.tokens.access_token
+		if access_token
+			data.access_token = access_token
 
 	json.stringify {t:"a",id:id,a:{u:url,m:method,d:data}}
 
