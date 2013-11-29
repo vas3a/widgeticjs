@@ -22,7 +22,8 @@ prepare_message = (url,method,data,id)->
 		url = "#{url}?access_token=#{link.tokens.access_token}"
 	else
 		data or= {}
-		data.access_token = link.tokens.access_token
+		if link.tokens?.access_token
+			data.access_token = link.tokens.access_token
 
 	json.stringify {t:"a",id:id,a:{u:url,m:method,d:data}}
 
