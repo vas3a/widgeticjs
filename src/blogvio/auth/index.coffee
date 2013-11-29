@@ -4,7 +4,6 @@ config  = require '../config'
 popup  	= require './popup'
 iframe 	= require './iframe'
 
-guid   	= require '../utils/guid'
 aye 	= require 'aye'
 
 app 	= {}
