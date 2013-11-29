@@ -14,9 +14,9 @@ module.exports 	= (grunt)->
 					extensions:['.coffee']
 					aliasMappings:[
 						{
-						cwd:'src/blogvio',
-						src: ['**/*.coffee'],
-						dest: 'blogvio'
+							cwd:'src/blogvio',
+							src: ['**/*.coffee'],
+							dest: '.',
 						}
 					]
 					postBundleCB:(err,src,next)->
