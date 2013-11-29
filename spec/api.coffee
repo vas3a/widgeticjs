@@ -1,6 +1,6 @@
-api 	= Blogvio.require 'blogvio/api/index'
-config 	= Blogvio.require 'blogvio/config'
-queue 	= Blogvio.require 'blogvio/utils/queue'
+api 	= Blogvio.require 'api/index'
+config 	= Blogvio.require 'config'
+queue 	= Blogvio.require 'utils/queue'
 describe 'blogvio/api/request', ->
 	jasmine.Ajax.install()
 	jasmine.Ajax.stubRequest('success?').andReturn({status:200,responseText:'{"success":true}'});

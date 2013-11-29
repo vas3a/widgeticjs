@@ -1,4 +1,4 @@
-detect 	= Blogvio.require 'blogvio/detect/index'
+detect 	= Blogvio.require 'detect/index'
 parse  	= detect.parse
 
 describe 'blogvio/detect', ->
