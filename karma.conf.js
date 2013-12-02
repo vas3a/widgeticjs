@@ -24,11 +24,16 @@ module.exports = function(config) {
     exclude: [
       
     ],
-
+    plugins:[
+        "karma-jasmine",
+        "karma-coffee-preprocessor",
+        "karma-phantomjs-launcher",
+        "karma-script-launcher"
+    ],
 
     // test results reporter to use
     // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-    reporters: ['progress'],
+    reporters: [],
 
 
     // web server port
@@ -59,8 +64,7 @@ module.exports = function(config) {
     browsers: ['PhantomJS'],
 
     preprocessors : {
-        '**/*.coffee': 'coffee',
-        '**/*.html': 'html2js'
+        '**/*.coffee': 'coffee'
     },
     // If browser does not capture in given timeout [ms], kill it
     captureTimeout: 60000,
