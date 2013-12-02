@@ -4,7 +4,8 @@
   "description": "Blogvio Javascript SDK",
   "main": "lib/sdk.js",
   "scripts": {
-    "test": "node_modules/.bin/grunt test"
+    "test": "node_modules/.bin/grunt test",
+    "install":"node_modules/.bin/grunt release"
   },
   "repository": {
     "type": "git",
