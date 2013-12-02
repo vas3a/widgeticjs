@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+  - 0.10
+deploy:
+  provider: npm
+  email: iulian.meghea@gmail.com
+  api_key:
+    secure: aXVsaWFuLm1lZ2hlYToybzgrMzhqcWlmdG83SU5CZnRwYy82WGQ=
+  on:
+    tags: true
+    repo: blogvio/blogviojs
