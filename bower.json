@@ -2,6 +2,7 @@
   "name": "blogviojs",
   "version": "0.0.4",
   "authors": [
+    "Blogvio <support@blogvio.com>",
     "Iulian Meghea <iulian.meghea@gmail.com>"
   ],
   "main": "lib/sdk.js",

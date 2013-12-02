@@ -4,13 +4,19 @@
   "description": "Blogvio Javascript SDK",
   "main": "lib/sdk.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "node_modules/.bin/grunt test"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/blogvio/blogviojs.git"
   },
-  "author": "Iulian Meghea <iulian.meghea@gmail.com>",
+  "author": "Blogvio <support@blogvio.com>",
+  "contributors": [ 
+    {
+      "name": "Iulian Meghea",
+      "email": "iulian.meghea@gmail.com"
+    } 
+  ],
   "license": "MIT",
   "devDependencies": {
     "grunt": "~0.4.2",
@@ -32,6 +38,7 @@
     "karma-coffee-preprocessor": "~0.1.1",
     "karma-phantomjs-launcher": "~0.1.1",
     "karma": "~0.10.6",
-    "browserify": "~2.35.4"
+    "browserify": "~2.35.4",
+    "grunt-cli": "~0.1.11"
   }
 }
