@@ -3,7 +3,8 @@
 This is a JavaScript client library for the Blogvio API,
 [written in CoffeeScript](http://coffeescript.org/), suitable for use in most
 browsers.
-[![Build Status](https://travis-ci.org/blogvio/blogviojs.png)](https://travis-ci.org/blogvio/blogviojs]
+
+[![Build Status](https://secure.travis-ci.org/blogvio/blogviojs.png?branch=master)](http://travis-ci.org/blogvio/blogviojs)
 ##Installation
 The source is available for download from
 [GitHub](http://github.com/blogvio/blogviojs).
