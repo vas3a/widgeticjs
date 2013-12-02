@@ -16,7 +16,7 @@ module.exports 	= (grunt)->
 						{
 							cwd:'src/blogvio',
 							src: ['**/*.coffee'],
-							dest: '.',
+							dest: '.'
 						}
 					]
 					postBundleCB:(err,src,next)->
