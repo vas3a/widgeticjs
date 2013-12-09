@@ -29,7 +29,7 @@ Root.prototype.createProxy = ->
 			clearTimeout timeout
 			console.error 'Could not initialize iframe'
 
-		timeout = setTimeout  fail,2000
+		timeout = setTimeout  fail,10000
 
 		Root._done = ->
 			api.setProxy (message)->proxy.contentWindow.postMessage message,'*'
