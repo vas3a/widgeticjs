@@ -16,7 +16,7 @@ request = (params)->
 		method = "POST"
 		
 	complete = (response,status)->
-		message.a.t = if status is 200 then 't' else 'f'
+		message.a.t = if status in [200, 201, 202, 204] then 't' else 'f'
 		message.a.d = response
 		message 	= json.stringify message
 		window.parent.postMessage message, '*'
