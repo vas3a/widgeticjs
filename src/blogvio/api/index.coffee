@@ -41,11 +41,12 @@ api.response 	= (message)->
 	a 	 	 = message.a
 	data	 = a.d
 
-	try
-		data = json.parse(data)
-	catch
-		deffered.reject  "JSON Parse error!"
-		return
+	if data isnt ""
+		try
+			data = json.parse(data)
+		catch
+			deffered.reject  "JSON Parse error!"
+			return
 
 	if a.t is 't'
 		deffered.resolve data
