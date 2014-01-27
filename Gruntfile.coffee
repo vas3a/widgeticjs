@@ -4,11 +4,12 @@ module.exports 	= (grunt)->
 	grunt.loadNpmTasks 'grunt-karma'
 	grunt.loadNpmTasks 'grunt-browserify'
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
+	grunt.loadNpmTasks 'grunt-contrib-watch'
 	grunt.initConfig(
 		browserify:
 			js:
 				dest: 'lib/sdk.js'
-				src:['src/index.coffee']			
+				src:['src/index.coffee']
 				options:
 					transform: ['coffeeify','debowerify']
 					extensions:['.coffee']
@@ -30,9 +31,24 @@ module.exports 	= (grunt)->
 			unit:
 				configFile: 'karma.conf.js'
 				background: false
+		watch:
+			js:
+				files: ['src/**/*.coffee']
+				tasks: ['notify:start_build', 'browserify', 'notify:finish_build']
+		notify:
+			start_build:
+				options:
+					enabled: true
+					title: "Watch."
+					message: 'Build started.'
+			finish_build:
+				options:
+					enabled: true
+					title: "Watch."
+					message: 'Build finished.'
 		connect:
 			options:
-				port:80
+				port:8082
 				base:'lib'
 				keepalive:true
 				hostname:"*"
@@ -45,6 +61,7 @@ module.exports 	= (grunt)->
 				options:
 					middleware:(connect)->[proxySnippet,mountFolder(connect,'./lib')]
 	)
+	grunt.loadNpmTasks 'grunt-notify'
 	grunt.loadNpmTasks 'grunt-contrib-connect'
 	grunt.loadNpmTasks 'grunt-connect-proxy'
 
