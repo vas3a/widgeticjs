@@ -25,6 +25,7 @@ Blogvio = ->
 	win['BlogvioAsyncInit']?()
 	event.on win,'message',receiver
 	detect win.location.href
+	Root.style()
 
 Blogvio.prototype.init = (client_id,redirect_uri)->
 	return @ unless (client_id and redirect_uri)

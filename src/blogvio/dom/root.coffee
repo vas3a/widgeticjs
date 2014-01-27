@@ -1,5 +1,7 @@
 css="#blogvio-root{position:absolute;top:-1000px;left:-1000px;width:0px;height:0px;visibility:hidden;z-index:-1}
-#blogvio-root iframe{width:0px;height:0px}"
+#blogvio-root iframe{width:0px;height:0px}
+iframe.blogvio-composition {border: none;width: 100%;height: 100%;}
+"
 
 config 	= require '../config'
 event 	= require '../utils/event'
@@ -10,13 +12,9 @@ aye 	= require 'aye'
 
 Root = ->
 	body = document.getElementsByTagName('body')[0]
-	head = document.getElementsByTagName('head')[0]
 
 	body.appendChild @el = document.createElement 'div'
 	@el.id = "blogvio-root"
-	
-	head.appendChild style = document.createElement('style')
-	style.textContent = css
 
 	@
 
@@ -45,5 +43,11 @@ Root.prototype.createProxy = ->
 
 Root.connect = ->
 	Root._done?()
+
+Root.style = ->
+	head = document.getElementsByTagName('head')[0]
+	
+	head.appendChild style = document.createElement('style')
+	style.textContent = css
 
 module.exports = Root
