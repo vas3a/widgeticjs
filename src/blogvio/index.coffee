@@ -7,16 +7,19 @@ detect 		= require './detect'
 JSON 		= require 'json3'
 event 		= require './utils/event'
 
+Composition = require './UI/composition'
+
 win 		= window
 
 receivers = {
-	'a'	: api.request
-	'e'	: api.response
-	'i'	: Root.connect
-	'o'	: auth.connect
+	'a'	: api.request  # api
+	'e'	: api.response # event
+	'i'	: Root.connect # init
+	'o'	: auth.connect # oauth
+	'u' : Composition.connect # composition
 }
 
-receiver = (e)->
+receiver = (e) ->
 	d = e.data
 	try 
 		receivers[(d = JSON.parse(d)).t]?(d)
@@ -43,4 +46,5 @@ Blogvio.prototype.Aye		= require 'aye'
 Blogvio.prototype.Event 	= event
 Blogvio.prototype.GUID 		= require './utils/guid'
 Blogvio.prototype.require 	= require
+Blogvio.prototype.UI        = require './UI'
 module.exports = Blogvio
