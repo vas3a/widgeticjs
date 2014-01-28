@@ -27,10 +27,19 @@ comps 	 = {}
 # 		]
 # 	}
 Composition = (holder, data) ->
+	# create the queue of messages
+	@_queue = queue(1)
+	# get the queue continuation function,
+	# so we can start the queue when the iframe is ready
+	@_queue.defer (next) => @_startQueue = next
+
+	# get the url
 	if typeof data is 'string'
 		url = config.composition.replace('{id}', data)
 	else if typeof data is 'object'
 		url = config.widget.replace('{id}', data.widget_id)
+		@setSkin data.skin or {}
+		@setContent data.content or []
 
 	# generate a unique id and save a reference to this composition
 	@id = guid()
@@ -43,11 +52,6 @@ Composition = (holder, data) ->
 	holder.appendChild @_iframe
 	@_iframe.setAttribute 'src', url
 
-	# create the queue of messages
-	@_queue = queue(1)
-	# get the queue continuation function,
-	# so we can start the queue when the iframe is ready
-	@_queue.defer (next) => @_startQueue = next
 	@
 
 # Starts the message queue. Called when the iframe is loaded.
@@ -86,8 +90,13 @@ Composition.prototype._sendMessage = (message) ->
 # Each method id a call to _sendMessage with the respective messageType.
 # The iframe should listen to these messages and modify the widget.
 methods = {
-	'setContent': 'sc'
-	'setSkin':    'ss'
+	'clearContent':  'cx'
+	'setContent':    'sc'
+	'addContent':    'ac'
+	'changeContent': 'cc'
+	'removeContent': 'rc'
+	'setSkin':       'ss'
+	'changeSkin':    'cs'
 }
 
 for method, messageType of methods
