@@ -1,9 +1,9 @@
-config 	 = require 'config'
-guid	 = require 'utils/guid'
-queue 	 = require 'queue-async'
+config = require 'config'
+guid   = require 'utils/guid'
+queue  = require 'queue-async'
 
 # Holds references to created compositions
-comps 	 = {}
+comps  = {}
 
 # Creates an iframe for the composition in the `holder`
 # 
@@ -49,10 +49,16 @@ Composition = (holder, data) ->
 	# create the iframe
 	@_iframe = document.createElement 'iframe'
 	@_iframe.setAttribute 'class', 'blogvio-composition'
+	@_iframe.setAttribute 'name', @id
 	holder.appendChild @_iframe
 	@_iframe.setAttribute 'src', url
 
 	@
+
+Composition.prototype.then = (callback) ->
+	@_queue.defer (next) =>
+		callback()
+		next()
 
 # Starts the message queue. Called when the iframe is loaded.
 # 
