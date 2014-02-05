@@ -15,8 +15,9 @@ domain 	= url.hashKey['domain'] || 'blogvio.com'
 config ={
 	proxy:"//#{domain}/sdk/proxy.html#proxy",
 	auth:"//#{domain}/oauth/v2/auth",
-	composition:"//#{domain}/api/v2/compositions/{id}/embed",
-	widget:"//#{domain}/api/v2/widgets/{id}/embed",
+	composition:"//#{domain}/api/v2/compositions/{id}/embed.html",
+	widget:"//#{domain}/api/v2/widgets/{id}/embed.html",
+	editor:"//#{domain}/api/v2/editor.html",
 	api:"/api/v2/"
 }
 module.exports = config
