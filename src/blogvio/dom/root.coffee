@@ -1,6 +1,7 @@
 css="#blogvio-root{position:absolute;top:-1000px;left:-1000px;width:0px;height:0px;visibility:hidden;z-index:-1}
 #blogvio-root iframe{width:0px;height:0px}
 iframe.blogvio-composition {border: none;width: 100%;height: 100%;}
+iframe.blogvio-editor {width: 490px; height: 565px; border:none;overflow:hidden}
 "
 
 config 	= require '../config'
