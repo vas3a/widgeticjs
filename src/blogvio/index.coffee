@@ -19,6 +19,7 @@ receivers = {
 	'o'	: auth.connect # oauth
 	'u' : Composition.connect # composition ready
 	'w' : Editor.connect # editor ready
+	'r' : Editor.relay # relay messages
 }
 
 receiver = (e) ->
