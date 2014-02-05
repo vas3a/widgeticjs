@@ -8,6 +8,7 @@ JSON 		= require 'json3'
 event 		= require './utils/event'
 
 Composition = require './UI/composition'
+Editor      = require './UI/editor'
 
 win 		= window
 
@@ -16,7 +17,8 @@ receivers = {
 	'e'	: api.response # event
 	'i'	: Root.connect # init
 	'o'	: auth.connect # oauth
-	'u' : Composition.connect # composition
+	'u' : Composition.connect # composition ready
+	'w' : Editor.connect # editor ready
 }
 
 receiver = (e) ->

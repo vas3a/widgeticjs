@@ -1,7 +1,12 @@
 Composition = require './composition'
+Editor = require './editor'
+
 composition = ->
 	new Composition arguments...
 
-UI = {composition}
+editor = ->
+	new Editor arguments...
+
+UI = {composition, editor}
 
 module.exports = UI
