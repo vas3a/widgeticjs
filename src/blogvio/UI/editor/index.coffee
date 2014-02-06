@@ -51,6 +51,42 @@ Editor.prototype.save = ->
 	@goTo('done')
 	@
 
+Editor.prototype.on = (ev, callback) ->
+	evs   = ev.split(' ')
+	calls = @hasOwnProperty('_callbacks') and @_callbacks or= {}
+	for name in evs
+		calls[name] or= []
+		calls[name].push(callback)
+	@
+
+Editor.prototype.off = (ev, callback) ->	
+	if arguments.length is 0
+		@_callbacks = {}
+		return @
+	return @ unless ev
+	evs = ev.split(' ')
+	for name in evs
+		list = @_callbacks?[name]
+		continue unless list
+		unless callback
+			delete @_callbacks[name]
+			continue
+		for cb, i in list when (cb is callback)
+			list = list.slice()
+			list.splice(i, 1)
+			@_callbacks[name] = list
+			break
+	@
+
+Editor.prototype._trigger = (args...) ->
+	ev = args.shift()
+	list = @hasOwnProperty('_callbacks') and @_callbacks?[ev]
+	return unless list
+	for callback in list
+		if callback.apply(@, args) is false
+			break
+	true
+
 # Send a message to the editor iframe
 # 
 # @private
