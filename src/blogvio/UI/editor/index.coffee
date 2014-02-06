@@ -35,6 +35,22 @@ Editor = (holder, @composition) ->
 
 	@
 
+# Close the editor
+Editor.prototype.close = ->
+	editors[@composition.id] = null
+	@_iframe.parentNode.removeChild(@_iframe)
+	@
+
+Editor.prototype.goTo = (step) ->
+	steps = ['skin', 'content', 'details', 'done']
+	return console.warn "The editor does not have the #{ step} step." unless step in steps
+	@_sendMessage {t: 'step', d: step}
+	@
+
+Editor.prototype.save = ->
+	@goTo('done')
+	@
+
 # Send a message to the editor iframe
 # 
 # @private
