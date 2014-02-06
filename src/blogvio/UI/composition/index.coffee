@@ -38,8 +38,8 @@ Composition = (holder, data) ->
 		url = config.composition.replace('{id}', data)
 	else if typeof data is 'object'
 		url = config.widget.replace('{id}', data.widget_id)
-		@setSkin data.skin or {}
-		@setContent data.content or []
+		@setSkin data.skin if data.skin
+		@setContent data.content if data.content
 
 	# generate a unique id and save a reference to this composition
 	@id = guid()
