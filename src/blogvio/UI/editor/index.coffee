@@ -110,8 +110,8 @@ Editor.prototype._compReady = ->
 
 # Given an editor id, calls the _ready method
 # Added as a postMessage receiver in blogvio/index
-Editor.connect = (id) ->
-	editors[id.d]._ready()
+Editor.connect = (data) ->
+	editors[data.id]._ready()
 
 # Calls _trigger on an editor with the event received from the iframe
 Editor.event = (data) ->
