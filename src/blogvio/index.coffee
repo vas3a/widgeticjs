@@ -20,6 +20,7 @@ receivers = {
 	'u' : Composition.connect # composition ready
 	'w' : Editor.connect # editor ready
 	'r' : Editor.relay # relay messages
+	'ee': Editor.event # editor event
 }
 
 receiver = (e) ->

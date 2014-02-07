@@ -113,6 +113,10 @@ Editor.prototype._compReady = ->
 Editor.connect = (id) ->
 	editors[id.d]._ready()
 
+# Calls _trigger on an editor with the event received from the iframe
+Editor.event = (data) ->
+	editors[data.id]._trigger(data.e, data.d)
+
 # Receives messages from the editor iframe and relays them through
 # Blogvio.api, then passes the response back to the iframe.
 # 
