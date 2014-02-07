@@ -41,16 +41,25 @@ Editor.prototype.close = ->
 	@_iframe.parentNode.removeChild(@_iframe)
 	@
 
+# Go to an editor step
+# Valid steps are: skin, content, details, done
 Editor.prototype.goTo = (step) ->
 	steps = ['skin', 'content', 'details', 'done']
 	return console.warn "The editor does not have the #{ step} step." unless step in steps
 	@_sendMessage {t: 'step', d: step}
 	@
 
+# Initialize a composition save
+# The editor will save the composition only if 
+#  - the selected skin has no pending changes
+#  - the composition meets the min and max content restrictions
 Editor.prototype.save = ->
 	@goTo('done')
 	@
 
+# Bind an event listener
+# Supported events are:
+#  - composition:save
 Editor.prototype.on = (ev, callback) ->
 	evs   = ev.split(' ')
 	calls = @hasOwnProperty('_callbacks') and @_callbacks or= {}
@@ -59,6 +68,7 @@ Editor.prototype.on = (ev, callback) ->
 		calls[name].push(callback)
 	@
 
+# Unbind an event listener
 Editor.prototype.off = (ev, callback) ->	
 	if arguments.length is 0
 		@_callbacks = {}
@@ -78,6 +88,9 @@ Editor.prototype.off = (ev, callback) ->
 			break
 	@
 
+# Trigger an event
+# 
+# @private
 Editor.prototype._trigger = (args...) ->
 	ev = args.shift()
 	list = @hasOwnProperty('_callbacks') and @_callbacks?[ev]
@@ -113,7 +126,7 @@ Editor.prototype._compReady = ->
 Editor.connect = (data) ->
 	editors[data.id]._ready()
 
-# Calls _trigger on an editor with the event received from the iframe
+# Calls _trigger on an editor with the event received from the editor iframe
 Editor.event = (data) ->
 	editors[data.id]._trigger(data.e, data.d)
 
