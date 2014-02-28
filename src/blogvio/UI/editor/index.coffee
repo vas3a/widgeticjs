@@ -22,7 +22,7 @@ Editor = (holder, @composition) ->
 	@_queue.defer (next) => @_startQueue = next
 
 	# register @_compReady as a callback for when the composition is ready
-	@composition.then(@_compReady.bind(this))
+	@composition.queue(@_compReady.bind(this))
 
 	# save a reference for the editor
 	editors[@composition.id] = @

@@ -55,7 +55,7 @@ Composition = (holder, data) ->
 
 	@
 
-Composition.prototype.then = (callback) ->
+Composition.prototype.queue = (callback) ->
 	@_queue.defer (next) =>
 		callback()
 		next()
