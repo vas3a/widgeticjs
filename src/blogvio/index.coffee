@@ -25,8 +25,16 @@ receivers = {
 
 receiver = (e) ->
 	d = e.data
+	try
+		d = JSON.parse(d)
+	catch error
+		console.warn 'Blogvio SDK: error parsing JSON:', d
+		return
+
 	try 
-		receivers[(d = JSON.parse(d)).t]?(d)
+		receivers[d.t]?(d)
+	catch error
+		console.error 'Blogvio SDK: ', error.stack
 
 Blogvio = ->
 	win['BlogvioAsyncInit']?()
