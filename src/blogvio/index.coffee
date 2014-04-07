@@ -28,6 +28,7 @@ receiver = (e) ->
 	try
 		d = JSON.parse(d)
 	catch error
+		return if d.startsWith('_FB_') # Facebook SDK
 		console.warn 'Blogvio SDK: error parsing JSON:', d
 		return
 
