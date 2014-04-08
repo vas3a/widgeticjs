@@ -1,6 +1,5 @@
 config 	 = require '../config'
 request  = require './request'
-auth 	 = require '../auth/index'
 queue 	 = require '../utils/queue'
 guid	 = require '../utils/guid'
 
@@ -53,12 +52,36 @@ api.response 	= (message)->
 	else
 		if data.error and data.error is 'invalid_grant'
 			ok = ->link.proxy( prepare_message.apply @, deffered.margs )
-			auth(false).then ok,(->deffered.reject 'Unable to login again!')
+			(require '../auth/index')(false).then ok,(->deffered.reject 'Unable to login again!')
 		else
 			deffered.reject data
 
 api.setProxy = (proxy)->link.proxy = proxy
 api.setTokens = (tokens)->link.tokens = tokens
+
+api.getStatus = -> 
+	if link.tokens?.access_token
+		return {
+			status: 'connected',
+			accessToken: link.tokens.access_token
+			expiresIn: link.tokens.expires_in
+			scope: link.tokens.scope
+		}
+	else
+		return { status: 'disconnected'}
+
+api.accessToken = (token) -> 
+	if token
+		link.tokens = {
+			access_token: token
+			expires_in: undefined
+			scope: undefined
+		}
+	
+	link.tokens?.access_token
+
+api.disconnect = ->	
+	link.tokens = null
 
 api.queue 		= queue
 api.request 	= request
