@@ -1,5 +1,5 @@
 config  = require '../config' 
-
+api     = require '../api'
 
 popup  	= require './popup'
 iframe 	= require './iframe'
@@ -35,10 +35,10 @@ auth.setAuthOptions = (id,uri,root)->
 
 auth.connect = (response)->
 	data = response.d
-	if data and data.access_token and data.refresh_token
-		require('../api/index').setTokens data
-		link.deffered.resolve("was ok")
+	if data and data.access_token
+		api.setTokens data
+		link.deffered.resolve api.getStatus()
 	else
-		link.deffered.reject "auth fail"
+		link.deffered.reject api.getStatus()
 
 module.exports = auth
