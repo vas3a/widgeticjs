@@ -18,7 +18,7 @@ popup  = (url,deffered)->
 	check = ->
 		if !win or win.closed
 			clearInterval interval
-			deffered.reject('window closed') if promise.isPending()
+			deffered.reject('window closed')
 
 	interval = setInterval(check,50)
 
