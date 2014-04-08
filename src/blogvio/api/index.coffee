@@ -10,7 +10,7 @@ json	 = require 'json3'
 defs 	= {}
 link = {}
 
-prepare_message = (url,method,data,id)->
+prepare_message = (url,method,data,id) ->
 	url = config.api + url
 	access_token = link.tokens?.access_token or false 
 	if (method or= 'GET') instanceof Object
@@ -26,19 +26,20 @@ prepare_message = (url,method,data,id)->
 
 	json.stringify {t:"a",id:id,a:{u:url,m:method,d:data}}
 
-api 	= (url,method,data)->
+api = (url,method,data) ->
+	# TODO: reject the promise if not authorized
 	id 	= guid()
 	promise = (defs[id] = deffered = aye.defer()).promise
-	queue.defer (next)=>
+	queue.defer (next) =>
 		message = prepare_message.apply @, deffered.margs = [url,method, data, id]
 		promise.then advance=(->defs[id] = null or next()),advance
 		link.proxy message
 	promise
 
-api.response 	= (message)->
+api.response = (message) ->
 	deffered = defs[message.id]
-	a 	 	 = message.a
-	data	 = a.d
+	a        = message.a
+	data     = a.d
 
 	if data isnt ""
 		try
@@ -56,8 +57,8 @@ api.response 	= (message)->
 		else
 			deffered.reject data
 
-api.setProxy = (proxy)->link.proxy = proxy
-api.setTokens = (tokens)->link.tokens = tokens
+api.setProxy = (proxy) ->link.proxy = proxy
+api.setTokens = (tokens) ->link.tokens = tokens
 
 api.getStatus = -> 
 	if link.tokens?.access_token
@@ -81,6 +82,7 @@ api.accessToken = (token) ->
 	link.tokens?.access_token
 
 api.disconnect = ->	
+	# TODO: invalidate the token
 	link.tokens = null
 
 api.queue 		= queue

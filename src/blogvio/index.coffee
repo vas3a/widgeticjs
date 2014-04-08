@@ -25,6 +25,7 @@ receivers = {
 }
 
 receiver = (e) ->
+	# TODO: test MessageEvent.origin
 	d = e.data
 	try
 		d = JSON.parse(d)
@@ -45,7 +46,7 @@ Blogvio = ->
 	Root.style()
 	ready => (@root = new Root()).createProxy()
 
-Blogvio.prototype.init = (client_id,redirect_uri)->
+Blogvio.prototype.init = (client_id, redirect_uri) ->
 	return @ unless (client_id and redirect_uri)
 	auth.setAuthOptions client_id,redirect_uri
 	@

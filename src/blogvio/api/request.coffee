@@ -19,6 +19,7 @@ request = (params)->
 		message.a.t = if status in [200, 201, 202, 204] then 't' else 'f'
 		message.a.d = response
 		message 	= json.stringify message
+		# TODO: set targetOrigin
 		window.parent.postMessage message, '*'
 
 	settings = {method,headers,complete}	

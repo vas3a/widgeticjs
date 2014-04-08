@@ -16,6 +16,7 @@ url = (scope=[])->
 	"#{config.auth}?client_id=#{app.id}&redirect_uri=#{app.uri}&response_type=token&scope=#{scope.join ' '}"
 
 auth = (interactive=true, scope) ->
+	# TODO: reject the deffered immediately if not initialized
 	deffered = aye.defer()
 	
 	oa = if interactive  then popup else iframe
