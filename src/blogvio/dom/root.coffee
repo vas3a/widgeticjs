@@ -7,6 +7,7 @@ iframe.blogvio-editor {width: 490px; height: 565px; border:none;overflow:hidden}
 config 	= require '../config'
 event 	= require '../utils/event'
 api 	= require '../api/index'
+iframe 	= require '../auth/iframe'
 steps   = api.queue.steps
 
 aye 	= require 'aye'
@@ -16,6 +17,7 @@ Root = ->
 
 	body.appendChild @el = document.createElement 'div'
 	@el.id = "blogvio-root"
+	iframe.setRoot @
 
 	@
 

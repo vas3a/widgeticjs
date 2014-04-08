@@ -6,6 +6,7 @@ detect 		= require './detect'
 
 JSON 		= require 'json3'
 event 		= require './utils/event'
+ready       = require './utils/ready'
 
 Composition = require './UI/composition'
 Editor      = require './UI/editor'
@@ -42,11 +43,11 @@ Blogvio = ->
 	event.on win,'message',receiver
 	detect win.location.href
 	Root.style()
+	ready => (@root = new Root()).createProxy()
 
 Blogvio.prototype.init = (client_id,redirect_uri)->
 	return @ unless (client_id and redirect_uri)
-	(@root = new Root()).createProxy()
-	auth.setAuthOptions client_id,redirect_uri, @root
+	auth.setAuthOptions client_id,redirect_uri
 	@
 
 Blogvio.prototype.api 		= ->api.apply @, arguments

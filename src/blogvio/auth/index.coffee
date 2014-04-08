@@ -25,7 +25,6 @@ auth = (interactive=true,scope=[])->
 auth.setAuthOptions = (id,uri,root)->
 	app.id = id
 	app.uri = uri
-	iframe.setRoot root
 
 auth.connect = (response)->
 	data = response.d
