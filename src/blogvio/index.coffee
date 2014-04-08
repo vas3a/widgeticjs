@@ -50,8 +50,11 @@ Blogvio.prototype.init = (client_id,redirect_uri)->
 	auth.setAuthOptions client_id,redirect_uri
 	@
 
-Blogvio.prototype.api 		= ->api.apply @, arguments
-Blogvio.prototype.auth  	= ->auth.apply @, arguments
+Blogvio.prototype.api 		  = -> api.apply @, arguments
+Blogvio.prototype.auth  	  = -> auth.apply @, arguments
+Blogvio.prototype.auth.status = -> api.getStatus.apply @, arguments
+Blogvio.prototype.auth.token  = -> api.accessToken.apply @, arguments
+Blogvio.prototype.auth.disconnect  = -> api.disconnect.apply @, arguments
 
 #accessible from outside
 Blogvio.prototype.JSON  	= JSON
@@ -62,4 +65,5 @@ Blogvio.prototype.GUID 		= require './utils/guid'
 Blogvio.prototype.require 	= require
 Blogvio.prototype.UI        = require './UI'
 Blogvio.prototype.VERSION   = '0.2.1'
+
 module.exports = Blogvio
