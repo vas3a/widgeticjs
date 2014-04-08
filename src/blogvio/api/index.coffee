@@ -73,7 +73,7 @@ api.getStatus = ->
 
 api.accessToken = (token) -> 
 	if token
-		link.tokens = {
+		api.setTokens {
 			access_token: token
 			expires_in: undefined
 			scope: undefined
