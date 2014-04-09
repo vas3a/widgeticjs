@@ -17,6 +17,7 @@
   ],
   "devDependencies": {
     "aye": "git+https://github.com/cburgmer/ayepromise.git#master",
+    "pubsub.js": "git+https://github.com/blogvio/pubsub.js.git",
     "queue-async": "*",
     "jasmine-ajax": "git+https://github.com/pivotal/jasmine-ajax.git#master",
     "uxhr": "https://github.com/eighttrackmind/uxhr.git#master"
