@@ -2,10 +2,21 @@ proxySnippet 	= require('grunt-connect-proxy/lib/utils').proxyRequest
 mountFolder  	= (connect, dir)->connect.static(require('path').resolve(dir))
 module.exports 	= (grunt)->
 	grunt.loadNpmTasks 'grunt-karma'
+	grunt.loadNpmTasks 'grunt-bump'
 	grunt.loadNpmTasks 'grunt-browserify'
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
 	grunt.loadNpmTasks 'grunt-contrib-watch'
 	grunt.initConfig(
+		bump: 
+			options: 
+				files: ['package.json', 'bower.json', 'src/blogvio/index.coffee'],
+				commit: true,
+				commitMessage: 'Release v%VERSION%',
+				commitFiles: ['package.json', 'bower.json', 'src/blogvio/index.coffee', 'lib/sdk.js']
+				createTag: true
+				tagName: '%VERSION%'
+				tagMessage: 'Version %VERSION%'
+				push: false
 		browserify:
 			js:
 				dest: 'lib/sdk.js'
