@@ -13,6 +13,8 @@ Editor      = require './UI/editor'
 
 win 		= window
 
+hasProxy    = false
+
 receivers = {
 	'a'	: api.request  # api
 	'e'	: api.response # event
@@ -44,14 +46,20 @@ Blogvio = ->
 	event.on win,'message',receiver
 	detect win.location.href
 	Root.style()
-	ready => (@root = new Root()).createProxy()
+
+Blogvio.prototype.initProxy = ->
+	return if hasProxy
+	ready => 
+		(@root = new Root()).createProxy()
+		hasProxy = true
 
 Blogvio.prototype.init = (client_id, redirect_uri) ->
+	@initProxy()
 	return @ unless (client_id and redirect_uri)
 	auth.setAuthOptions client_id,redirect_uri
 	@
 
-Blogvio.prototype.api 		  = -> api.apply @, arguments
+Blogvio.prototype.api 		  = -> @initProxy(); return api.apply @, arguments
 Blogvio.prototype.auth  	  = -> auth.apply @, arguments
 Blogvio.prototype.auth.status = -> api.getStatus.apply @, arguments
 Blogvio.prototype.auth.token  = -> api.accessToken.apply @, arguments
