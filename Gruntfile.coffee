@@ -7,16 +7,26 @@ module.exports 	= (grunt)->
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
 	grunt.loadNpmTasks 'grunt-contrib-watch'
 	grunt.initConfig(
+		pkg: grunt.file.readJSON 'package.json'
 		bump: 
 			options: 
-				files: ['package.json', 'bower.json', 'src/blogvio/index.coffee'],
+				files: ['package.json', 'bower.json'],
+				updateConfigs: ['pkg'],
 				commit: true,
 				commitMessage: 'Release v%VERSION%',
-				commitFiles: ['package.json', 'bower.json', 'src/blogvio/index.coffee', 'lib/sdk.js']
+				commitFiles: ['package.json', 'bower.json', 'lib/sdk.js']
 				createTag: true
 				tagName: '%VERSION%'
 				tagMessage: 'Version %VERSION%'
 				push: false
+		replace:
+			version:
+				src: ['lib/sdk.js'],
+				overwrite: true,
+				replacements: [{
+					from: /@VERSION/g,
+					to: "<%= pkg.version %>"
+				}]
 		browserify:
 			js:
 				dest: 'lib/sdk.js'
@@ -75,9 +85,11 @@ module.exports 	= (grunt)->
 	grunt.loadNpmTasks 'grunt-notify'
 	grunt.loadNpmTasks 'grunt-contrib-connect'
 	grunt.loadNpmTasks 'grunt-connect-proxy'
+	grunt.loadNpmTasks 'grunt-text-replace'
 
-	grunt.registerTask 'build', 	['browserify']
-	grunt.registerTask 'release',	['build','uglify']
-	grunt.registerTask 'test', 		['karma']
-	grunt.registerTask 'server',	['configureProxies','connect:server']
-	grunt.registerTask 'default', 	['build']
+	grunt.registerTask 'build',         ['browserify']
+	grunt.registerTask 'build-release', ['build','uglify']
+	grunt.registerTask 'release',       ['build-release', 'bump-only', 'replace:version', 'bump-commit']
+	grunt.registerTask 'test',          ['karma']
+	grunt.registerTask 'server',        ['configureProxies','connect:server']
+	grunt.registerTask 'default',       ['build']
