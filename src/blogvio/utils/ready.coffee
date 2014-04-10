@@ -1,4 +1,8 @@
 ready = (fn) -> 
+  if document.readyState is 'complete' or document.readyState is 'interactive'
+    fn()
+    return
+
   if document.addEventListener
     document.addEventListener 'DOMContentLoaded', fn
   else
