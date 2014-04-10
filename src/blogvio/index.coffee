@@ -6,7 +6,7 @@ detect 		= require './detect'
 
 JSON 		= require 'json3'
 event 		= require './utils/event'
-ready       = require './utils/ready'
+whenReady   = require './utils/ready'
 
 Composition = require './UI/composition'
 Editor      = require './UI/editor'
@@ -48,11 +48,17 @@ Blogvio = ->
 	detect win.location.href
 	Root.style()
 
+# TODO: move this inside Root
 Blogvio.prototype.initProxy = ->
 	return if hasProxy
-	ready => 
+	create = => 
 		(@root = new Root()).createProxy()
 		hasProxy = true
+	if document.getElementsByTagName('body')[0]
+		create()
+	else
+		whenReady create
+
 
 Blogvio.prototype.init = (client_id, redirect_uri) ->
 	@initProxy()
