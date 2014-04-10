@@ -30,6 +30,7 @@ receiver = (e) ->
 	# TODO: test MessageEvent.origin
 	d = e.data
 	try
+		return unless typeof d is "string"
 		d = JSON.parse(d)
 	catch error
 		return if d.startsWith('_FB_') # Facebook SDK
