@@ -74,6 +74,6 @@ Blogvio.prototype.Event 	= event
 Blogvio.prototype.GUID 		= require './utils/guid'
 Blogvio.prototype.require 	= require
 Blogvio.prototype.UI        = require './UI'
-Blogvio.prototype.VERSION   = '0.2.2'
+Blogvio.prototype.VERSION   = '0.2.3'
 
 module.exports = Blogvio
