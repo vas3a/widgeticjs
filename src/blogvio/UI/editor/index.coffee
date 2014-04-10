@@ -104,31 +104,27 @@ Editor.prototype._trigger = (args...) ->
 # 
 # @private
 Editor.prototype._sendMessage = (message) ->
-	@_iframe.contentWindow.postMessage JSON.stringify(message), '*'
+	@_queue.defer (next) =>
+		@_iframe.contentWindow.postMessage JSON.stringify(message), '*'
+		next()
 
 # Called when the editor iframe is ready, starts processing the queue
 # 
 # @private
-Editor.prototype._ready = ->
-	@_startQueue()
+Editor.prototype._ready = -> @_startQueue()
 
 # Called when the composition is ready
 # Notifies the editor that the composition is ready
 # 
 # @private
-Editor.prototype._compReady = ->
-	@_queue.defer (next) =>
-		@_sendMessage {t: 'ready'}
-		next()
+Editor.prototype._compReady = -> @_sendMessage {t: 'ready'}
 
 # Given an editor id, calls the _ready method
 # Added as a postMessage receiver in blogvio/index
-Editor.connect = (data) ->
-	editors[data.id]._ready()
+Editor.connect = (data) -> editors[data.id]._ready()
 
 # Calls _trigger on an editor with the event received from the editor iframe
-Editor.event = (data) ->
-	editors[data.id]._trigger(data.e, data.d)
+Editor.event = (data) -> editors[data.id]._trigger(data.e, data.d)
 
 # Receives messages from the editor iframe and relays them through
 # Blogvio.api, then passes the response back to the iframe.
