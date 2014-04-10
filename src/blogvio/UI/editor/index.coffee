@@ -1,5 +1,8 @@
 config  = require 'config'
 queue   = require 'queue-async'
+pubsub  = require 'pubsub.js'
+
+api = require '../../api'
 
 # holds references to created editors
 editors = {}
@@ -32,6 +35,9 @@ Editor = (holder, @composition) ->
 	@_iframe.setAttribute 'class', 'blogvio-editor'
 	holder.appendChild @_iframe
 	@_iframe.setAttribute 'src', config.editor + '#' + @composition.id
+
+	pubsub.subscribe 'api/token/update', @_updateToken.bind(@)
+	@_updateToken()
 
 	@
 
@@ -118,6 +124,12 @@ Editor.prototype._ready = -> @_startQueue()
 # 
 # @private
 Editor.prototype._compReady = -> @_sendMessage {t: 'ready'}
+
+# Called when the access token is updated (channel: api/token/update)
+# Updates the editor's token
+# 
+# @private
+Editor.prototype._updateToken = -> @_sendMessage {t: 'token', d: api.accessToken()}
 
 # Given an editor id, calls the _ready method
 # Added as a postMessage receiver in blogvio/index
