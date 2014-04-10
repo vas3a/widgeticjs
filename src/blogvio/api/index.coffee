@@ -5,6 +5,7 @@ guid	 = require '../utils/guid'
 
 aye 	 = require 'aye'
 json	 = require 'json3'
+pubsub   = require 'pubsub.js'
 
 
 defs 	= {}
@@ -57,8 +58,11 @@ api.response = (message) ->
 		else
 			deffered.reject data
 
-api.setProxy = (proxy) ->link.proxy = proxy
-api.setTokens = (tokens) ->link.tokens = tokens
+api.setProxy = (proxy) -> link.proxy = proxy
+
+api.setTokens = (tokens) ->
+	link.tokens = tokens
+	pubsub.publish 'api/token/update'
 
 api.getStatus = -> 
 	if link.tokens?.access_token
