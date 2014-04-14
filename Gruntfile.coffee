@@ -34,6 +34,7 @@ module.exports 	= (grunt)->
 				options:
 					transform: ['coffeeify','debowerify']
 					extensions:['.coffee']
+					external: ['spine/utils/timestamp']
 					aliasMappings:[
 						{
 							cwd:'src/blogvio',
