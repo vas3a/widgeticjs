@@ -8,7 +8,9 @@ api = require '../../api'
 editors = {}
 
 # Creates an iframe with an editor for the composition
+# TODO: add selectSkin
 Editor = (holder, @composition) ->
+	Blogvio.debug.timestamp 'Blogvio.UI.Editor:constructor'
 	# create a queue of messages
 	@_queue = queue(1)
 	# get the queue continuation function
@@ -108,19 +110,25 @@ Editor.prototype._sendMessage = (message) ->
 # Called when the editor iframe is ready, starts processing the queue
 # 
 # @private
-Editor.prototype._ready = -> @_startQueue()
+Editor.prototype._ready = -> 
+	Blogvio.debug.timestamp 'Blogvio.UI.Editor:_ready'
+	@_startQueue()
 
 # Called when the composition is ready
 # Notifies the editor that the composition is ready
 # 
 # @private
-Editor.prototype._compReady = -> @_sendMessage {t: 'ready'}
+Editor.prototype._compReady = -> 
+	Blogvio.debug.timestamp 'Blogvio.UI.Editor:_compReady'
+	@_sendMessage {t: 'ready'}
 
 # Called when the access token is updated (channel: api/token/update)
 # Updates the editor's token
 # 
 # @private
-Editor.prototype._updateToken = -> @_sendMessage {t: 'token', d: api.accessToken()}
+Editor.prototype._updateToken = -> 
+	Blogvio.debug.timestamp 'Blogvio.UI.Editor:_updateToken'
+	@_sendMessage {t: 'token', d: api.accessToken()}
 
 # Given an editor id, calls the _ready method
 # Added as a postMessage receiver in blogvio/index

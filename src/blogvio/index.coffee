@@ -81,5 +81,8 @@ Blogvio.prototype.pubsub    = require 'pubsub.js'
 Blogvio.prototype.require 	= require
 Blogvio.prototype.UI        = require './UI'
 Blogvio.prototype.VERSION   = '@VERSION'
+Blogvio.prototype.debug     = {
+	timestamp: require './utils/timestamp'
+}
 
 module.exports = Blogvio

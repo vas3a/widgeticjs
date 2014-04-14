@@ -27,6 +27,7 @@ comps  = {}
 # 		]
 # 	}
 Composition = (holder, data) ->
+	Blogvio.debug.timestamp 'Blogvio.UI.Composition:constructor'
 	# create the queue of messages
 	@_queue = queue(1)
 	# get the queue continuation function,
@@ -64,6 +65,7 @@ Composition.prototype.queue = (callback) ->
 # 
 # @private
 Composition.prototype._ready = ->
+	Blogvio.debug.timestamp 'Blogvio.UI.Composition:_ready'
 	@_startQueue()
 
 # Adds a postMessage to the queue
