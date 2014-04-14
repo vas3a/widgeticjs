@@ -7,16 +7,6 @@ api = require '../../api'
 # holds references to created editors
 editors = {}
 
-# Given an editor, an id and status, generates a function that
-# sends a `relay response` message back to the editor.
-relayMessage = (editor, deferredId, status) -> (response) ->
-	editor._sendMessage {
-		t: 'rr',
-		s: status,
-		did: deferredId,
-		d: response
-	}
-
 # Creates an iframe with an editor for the composition
 Editor = (holder, @composition) ->
 	# create a queue of messages
@@ -137,24 +127,5 @@ Editor.connect = (data) -> editors[data.id]._ready()
 
 # Calls _trigger on an editor with the event received from the editor iframe
 Editor.event = (data) -> editors[data.id]._trigger(data.e, data.d)
-
-# Receives messages from the editor iframe and relays them through
-# Blogvio.api, then passes the response back to the iframe.
-# 
-# @example `event`
-# 	{
-# 		t: 'r',
-# 		id: 1234 # the id of the editor
-# 		a: [
-# 			did, # the id of the deferred request created in the editor
-# 			arguments... # the arguments to be passed to Blogvio.api
-# 		] 
-# 	}
-Editor.relay = (event) ->
-	editor = editors[event.id]
-	[did, args...] = event.a
-	Blogvio.api.apply(Blogvio, args)
-		.then relayMessage(editor, did, 's'), relayMessage(editor, did, 'f')
-
 
 module.exports = Editor

@@ -22,7 +22,6 @@ receivers = {
 	'o'	: auth.connect # oauth
 	'u' : Composition.connect # composition ready
 	'w' : Editor.connect # editor ready
-	'r' : Editor.relay # relay messages
 	'ee': Editor.event # editor event
 }
 
@@ -49,7 +48,7 @@ Blogvio = ->
 	Root.style()
 
 # TODO: move this inside Root
-Blogvio.prototype.initProxy = ->
+initProxy = ->
 	return if hasProxy
 	create = => 
 		(@root = new Root()).createProxy()
@@ -61,12 +60,12 @@ Blogvio.prototype.initProxy = ->
 
 
 Blogvio.prototype.init = (client_id, redirect_uri) ->
-	@initProxy()
+	initProxy()
 	return @ unless (client_id and redirect_uri)
 	auth.setAuthOptions client_id,redirect_uri
 	@
 
-Blogvio.prototype.api 		  = -> @initProxy(); return api.apply @, arguments
+Blogvio.prototype.api 		  = -> initProxy(); return api.apply @, arguments
 Blogvio.prototype.auth  	  = -> auth.apply @, arguments
 Blogvio.prototype.auth.status = -> api.getStatus.apply @, arguments
 Blogvio.prototype.auth.token  = -> api.accessToken.apply @, arguments
@@ -78,6 +77,7 @@ Blogvio.prototype.Queue 	= api.queue
 Blogvio.prototype.Aye		= require 'aye'
 Blogvio.prototype.Event 	= event
 Blogvio.prototype.GUID 		= require './utils/guid'
+Blogvio.prototype.pubsub    = require 'pubsub.js'
 Blogvio.prototype.require 	= require
 Blogvio.prototype.UI        = require './UI'
 Blogvio.prototype.VERSION   = '@VERSION'
