@@ -14,6 +14,10 @@ Editor = (holder, @composition) ->
 	# get the queue continuation function
 	@_queue.defer (next) => @_startQueue = next
 
+	# send the access token to the iframe
+	pubsub.subscribe 'api/token/update', @_updateToken.bind(@)
+	@_updateToken()
+
 	# register @_compReady as a callback for when the composition is ready
 	@composition.queue(@_compReady.bind(this))
 
@@ -25,9 +29,6 @@ Editor = (holder, @composition) ->
 	@_iframe.setAttribute 'class', 'blogvio-editor'
 	holder.appendChild @_iframe
 	@_iframe.setAttribute 'src', config.editor + '#' + @composition.id
-
-	pubsub.subscribe 'api/token/update', @_updateToken.bind(@)
-	@_updateToken()
 
 	@
 
