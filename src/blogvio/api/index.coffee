@@ -87,6 +87,7 @@ api.accessToken = (token) ->
 
 api.disconnect = ->	
 	# TODO: invalidate the token
+	pubsub.publish 'api/token/update'
 	link.tokens = null
 
 api.queue 		= queue
