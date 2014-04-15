@@ -9,7 +9,7 @@ editors = {}
 
 # Creates an iframe with an editor for the composition
 # TODO: add selectSkin
-Editor = (holder, @composition) ->
+Editor = (holder, @composition, opts) ->
 	Blogvio.debug.timestamp 'Blogvio.UI.Editor:constructor'
 	# create a queue of messages
 	@_queue = queue(1)
@@ -19,6 +19,8 @@ Editor = (holder, @composition) ->
 	# send the access token to the iframe
 	pubsub.subscribe 'api/token/update', @_updateToken.bind(@)
 	@_updateToken()
+
+	@setEditorOptions opts if opts
 
 	# register @_compReady as a callback for when the composition is ready
 	@composition.queue(@_compReady.bind(this))
@@ -43,6 +45,17 @@ Editor.prototype.close = ->
 # Go to an editor step
 Editor.prototype.goTo = (step) ->
 	@_sendMessage {t: 'step', d: step}
+	@
+
+# Set custom options for editor
+# options = {
+#	skin_editor: { enabled: [true, false] #default: true }, 
+#	step: ['skin', 'edit_skin', 'content', 'details'] #default: 'skin',
+#	navigation: { enabled: [true, false] #default: true }, 
+#	skin: [object Skin]
+# }
+Editor.prototype.setEditorOptions = (options) ->
+	@_sendMessage {t: 'opts', d: options}
 	@
 
 # Initialize a composition save
