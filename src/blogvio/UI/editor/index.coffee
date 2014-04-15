@@ -41,10 +41,7 @@ Editor.prototype.close = ->
 	@
 
 # Go to an editor step
-# Valid steps are: skin, content, details, done
 Editor.prototype.goTo = (step) ->
-	steps = ['skin', 'content', 'details', 'done']
-	return console.warn "The editor does not have the #{ step} step." unless step in steps
 	@_sendMessage {t: 'step', d: step}
 	@
 
