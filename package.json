@@ -1,6 +1,6 @@
 {
   "name": "blogviojs",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Blogvio Javascript SDK",
   "main": "lib/sdk.js",
   "scripts": {
