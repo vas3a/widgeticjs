@@ -7,6 +7,7 @@ module.exports 	= (grunt)->
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
 	grunt.loadNpmTasks 'grunt-contrib-watch'
 	grunt.loadNpmTasks 'grunt-groundskeeper'
+	grunt.loadNpmTasks 'grunt-contrib-copy'
 	grunt.initConfig(
 		pkg: grunt.file.readJSON 'package.json'
 		groundskeeper:
@@ -53,6 +54,10 @@ module.exports 	= (grunt)->
 					postBundleCB:(err,src,next)->
 						src = src.slice(8) if src
 						next(err,src)
+		copy:
+			js:
+				src: 'lib/sdk.dev.js'
+				dest: 'lib/sdk.js'
 		uglify:
 			js:
 				files:
@@ -64,7 +69,7 @@ module.exports 	= (grunt)->
 		watch:
 			js:
 				files: ['src/**/*.coffee']
-				tasks: ['notify:start_build', 'browserify', 'notify:finish_build']
+				tasks: ['notify:start_build', 'browserify', 'copy', 'notify:finish_build']
 		notify:
 			start_build:
 				options:
