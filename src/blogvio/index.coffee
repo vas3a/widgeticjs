@@ -10,6 +10,7 @@ whenReady   = require './utils/ready'
 
 Composition = require './UI/composition'
 Editor      = require './UI/editor'
+UI          = require './UI'
 
 win 		= window
 
@@ -46,6 +47,7 @@ Blogvio = ->
 	event.on win,'message',receiver
 	detect win.location.href
 	Root.style()
+	UI.parse()
 
 # TODO: move this inside Root
 initProxy = ->
@@ -79,7 +81,7 @@ Blogvio.prototype.Event 	= event
 Blogvio.prototype.GUID 		= require './utils/guid'
 Blogvio.prototype.pubsub    = require 'pubsub.js'
 Blogvio.prototype.require 	= require
-Blogvio.prototype.UI        = require './UI'
+Blogvio.prototype.UI        = UI
 Blogvio.prototype.VERSION   = '@VERSION'
 Blogvio.prototype.debug     = {
 	timestamp: require './utils/timestamp'
