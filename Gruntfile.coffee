@@ -103,7 +103,10 @@ module.exports 	= (grunt)->
 
 	grunt.registerTask 'build',         ['browserify']
 	grunt.registerTask 'build-release', ['build', 'groundskeeper', 'uglify']
-	grunt.registerTask 'release',       ['build-release', 'bump-only', 'replace:version', 'bump-commit']
+	grunt.registerTask 'release',       ['release:minor']
+	grunt.registerTask 'release:patch', ['build-release', 'bump-only:patch', 'replace:version', 'bump-commit']
+	grunt.registerTask 'release:minor', ['build-release', 'bump-only:minor', 'replace:version', 'bump-commit']
+	grunt.registerTask 'release:major', ['build-release', 'bump-only:major', 'replace:version', 'bump-commit']
 	grunt.registerTask 'test',          ['karma']
 	grunt.registerTask 'server',        ['configureProxies','connect:server']
 	grunt.registerTask 'default',       ['build']
