@@ -41,7 +41,7 @@ stylesFactory = {
 		{
 			holdStyle: "height: #{ height }px; padding-top: 0;"
 		}
-	'preserve-aspect-ratio': (width, height) -> 
+	'fill': (width, height) -> 
 		ratio = height * 100 / width;
 		{
 			holdStyle: "padding-top: #{ ratio }%;"
