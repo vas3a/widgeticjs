@@ -1,13 +1,8 @@
 ready = (fn) -> 
-  if document.readyState is 'complete' or document.readyState is 'interactive'
+  if document.readyState is 'complete'
     fn()
     return
 
-  if document.addEventListener
-    document.addEventListener 'DOMContentLoaded', fn
-  else
-    document.attachEvent 'onreadystatechange', ->
-      if document.readyState is 'interactive'
-        fn()
+  document.addEventListener 'DOMContentLoaded', fn
 
 module.exports = ready
