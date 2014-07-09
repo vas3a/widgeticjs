@@ -33,7 +33,7 @@ receiver = (e) ->
 		return unless typeof d is "string"
 		d = JSON.parse(d)
 	catch error
-		return if d.startsWith('_FB_') # Facebook SDK
+		return if d.indexOf('_FB_') == 0 # Facebook SDK
 		console.warn 'Blogvio SDK: error parsing JSON:', d
 		return
 
