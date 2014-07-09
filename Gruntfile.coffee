@@ -101,7 +101,7 @@ module.exports 	= (grunt)->
 	grunt.loadNpmTasks 'grunt-connect-proxy'
 	grunt.loadNpmTasks 'grunt-text-replace'
 
-	grunt.registerTask 'build',         ['browserify']
+	grunt.registerTask 'build',         ['browserify', 'copy']
 	grunt.registerTask 'build-release', ['build', 'groundskeeper', 'uglify']
 	grunt.registerTask 'release',       ['release:minor']
 	grunt.registerTask 'release:patch', ['build-release', 'bump-only:patch', 'replace:version', 'bump-commit']
