@@ -38,7 +38,7 @@ receiver = (e) ->
 		return
 
 	try 
-		receivers[d.t]?(d)
+		receivers[d.t]?(d, e)
 	catch error
 		console.error 'Blogvio SDK: ', error.stack
 
