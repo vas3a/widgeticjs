@@ -31,7 +31,6 @@ class Popup
 	# The postmessage receiver for popup ('p') messages
 	# Calls the event handlers
 	@receiver: (message, event) =>
-		debugger
 		method = message.d.event
 		@[method]?(message, event)
 
@@ -40,7 +39,6 @@ class Popup
 	# Creates a popup iframe with the given name and notifies the caller
 	# when the iframe is ready
 	@create: (message, event) ->
-		debugger
 		log('Popup.create', message)
 		name = message.d.name
 
@@ -62,14 +60,12 @@ class Popup
 	# Message handler
 	# Will run in the parent window
 	@ready: (message) ->
-		debugger
 		log('Popup.ready', message)
 		@callbacks[message.d.name]?()
 
 	# Message handler
 	# Will run in the child window
 	@created: (message, event) ->
-		debugger
 		event.source.frames[message.d.name].document
 		@defs[message.id].resolve('ceva')
 		log('Popup.created', message)
