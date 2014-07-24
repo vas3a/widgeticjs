@@ -7,7 +7,16 @@ config = require 'config'
 
 log = (text, other...) ->
 	console.debug('%c' + window.location.host + window.location.pathname + ' ' + text, 'background: #222; color: #bada55', other...)
-		 
+
+extend = (out = {}) ->
+  for arg in arguments
+    continue unless arg
+
+    for key of arg
+      out[key] = arg[key] if arg.hasOwnProperty(key)
+
+  return out
+
 loadSheet = (url, el, callback) ->
 	link = @document.createElement 'link'
 	link.setAttribute 'rel', 'stylesheet'
@@ -23,7 +32,7 @@ newMessage = (data) ->
 	defid   = guid()
 	promise = (defs[defid] = deffered = aye.defer()).promise
 	message = {id: defid, t: 'p', d: data}
-	{promise, message}
+	{ promise, message }
 
 ackMessage = (message, data) ->
 	defs[message.id].resolve(data)
@@ -53,22 +62,14 @@ class Popup
 		@popups[name] = new Popup options
 
 		# initialize the popup iframe and return the promise
-		return @init(@popups[name])
+		return @popups[name].init()
 
 	# The postmessage receiver for popup ('p') messages
 	# Calls the event handlers
 	@receiver: (message, event) =>
 		method = message.d.event
+		console?.warn 'UI.Popup: There is no handler for the event: ' + method unless @[method]
 		@[method]?(message, event)
-
-	# Sends a message to the parent frame to create an iframe
-	# Used in child frame
-	# Returns a promise that will be resolved
-	# when the iframe has loaded (@see @created)
-	@init: (popup) ->
-		{promise, message} = newMessage({ name: popup.name, event: 'create' })
-		send(message)
-		return promise.then(popup._prepare)
 
 	# Message handler
 	# Will run in the parent frame
@@ -81,7 +82,7 @@ class Popup
 		iframe = document.createElement 'iframe'
 		iframe.setAttribute 'class', 'wdgtc-popup'
 		iframe.setAttribute 'name', name
-		iframe.setAttribute 'style', 'border: 0; width: 0; height: 0; position: absolute; top: 0; left: 0; z-index: 1000000'
+		iframe.setAttribute 'style', 'border: 0; width: 0; height: 0; position: absolute; top: 0; left: 0; z-index: 1000000; display: none'
 
 		document.querySelectorAll('body')[0].appendChild iframe
 		iframe.setAttribute 'src', config.popup + '&name=' + encodeURIComponent(name) + '&event=ready'
@@ -119,6 +120,28 @@ class Popup
 
 	@resized: (message, event) -> ackMessage(message, message.d.dimensions)
 
+	@hide: (message, event) ->
+		name = message.d.name
+		iframe = @iframes[name]
+
+		iframe.style.display = 'none'
+
+		message.d.event = 'hidden'
+		send(message, event.source)
+
+	@hidden: (message, event) -> ackMessage(message)
+
+	@show: (message, event) ->
+		name = message.d.name
+		iframe = @iframes[name]
+
+		iframe.style.display = 'block'
+
+		message.d.event = 'shown'
+		send(message, event.source)
+
+	@shown: (message, event) -> ackMessage(message)
+
 	constructor: (options) ->
 		# parse the options
 		@options = options
@@ -127,6 +150,39 @@ class Popup
 			@[key] = value
 
 		@dimensions = { width: 0, height: 0 }
+
+	# Sends a message to the parent frame to create an iframe
+	# Used in child frame
+	# Returns a promise that will be resolved
+	# when the iframe has loaded (@see @created)
+	init: ->
+		promise = @_sendEvent('create')
+		return promise.then(@_prepare)
+
+	append: (el) ->
+		el = el[0] if el.jquery
+		log('append', el)
+		@body.appendChild(el)
+		return @resize()
+		# @resize().then(@reposition)
+
+	resize: =>
+		@dimensions = {
+			width:  @body.offsetWidth
+			height: @body.offsetHeight
+		}
+		@_sendEvent('resize', { @dimensions })
+
+	hide: -> @_sendEvent('hide')
+
+	show: -> @_sendEvent('show')
+
+	_sendEvent: (event, extra) ->
+		data = { @name, event }
+		data = extend(data, extra)
+		{ promise, message } = newMessage(data)
+		send(message)
+		return promise
 
 	# Caches relevant nodes from the iframe and styles the contents
 	_prepare: (document) =>
@@ -141,25 +197,5 @@ class Popup
 		loadSheet sheet, @head, @resize for sheet in @css
 
 		return @
-
-	append: (el) ->
-		el = el[0] if el.jquery
-		log('append', el)
-		@body.appendChild(el)
-		return @resize()
-		# @resize().then(@reposition)
-
-	resize: =>
-		@dimensions = {
-			width:  @body.offsetWidth
-			height: @body.offsetHeight
-		}
-		{promise, message} = newMessage({ @name, event: 'resize', @dimensions })
-		send(message)
-		return promise
-
-	hide: -> log('hide')
-
-	show: -> log('show')
 
 module.exports = Popup
