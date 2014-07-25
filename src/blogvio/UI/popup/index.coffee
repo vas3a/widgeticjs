@@ -191,10 +191,10 @@ class Popup
 		@_sendEvent('manage', { do: 'resize', @dimensions })
 
 	# Requests for the popup to be hid
-	hide: -> @_sendEvent('manage', { do: 'hide') })
+	hide: -> @_sendEvent('manage', { do: 'hide' })
 
 	# Requests for the popup to be shown
-	show: -> @_sendEvent('manage', { do: 'show') })
+	show: -> @_sendEvent('manage', { do: 'show' })
 
 	# Sends an event to the parent frame with the popup name info
 	_sendEvent: (event, extra) ->
