@@ -41,6 +41,15 @@ send = (message, target = window.parent) ->
 	target = window.frames[target] if typeof target is 'string'
 	target.postMessage(JSON.stringify(message), '*')
 
+replyMessage = (message, event, response) ->
+	message.d.original = message.d.event
+	message.d.event = 'done'
+	message.d.response = response
+	send(message, event.source)
+
+ucfirst = (string) ->
+    string.charAt(0).toUpperCase() + string.slice(1)
+
 # Handles popup management and cross-frame popup creation
 class Popup
 	# Popups created using @new (used in child frame)
@@ -68,14 +77,15 @@ class Popup
 	# Calls the event handlers
 	@receiver: (message, event) =>
 		method = message.d.event
-		console?.warn 'UI.Popup: There is no handler for the event: ' + method unless @[method]
+		method = 'on' + ucfirst(method)
+		console?.warn 'UI.Popup: There is no handler for the event: ' + method unless @[method]		
 		@[method]?(message, event)
 
 	# Message handler
 	# Will run in the parent frame
 	# Creates a popup iframe with the given name and register a callback
 	# to notify the caller when the iframe is ready
-	@create: (message, event) ->
+	@onCreate: (message, event) ->
 		name = message.d.name
 
 		# create the popup frame
@@ -92,55 +102,61 @@ class Popup
 		# @see @ready
 		@callbacks[name] = =>
 			delete @callbacks[name]
-			# notify load
-			message.d.event = 'created'
-			send(message, event.source)
+			replyMessage(message, event)
 
 	# Message handler
 	# Will run in the parent frame
+	# Called when the popup iframe has loaded
 	# Runs the load callback for the iframe
-	@ready: (message) -> @callbacks[message.d.name]?()
+	@onReady: (message) -> @callbacks[message.d.name]?()
+
+	# Message handler
+	# Will run in the child frame
+	# Called when the parent frame replies to the message
+	# Acknowledges the message with the response sent from the parent frame
+	# The handling of the event replies can be customized by creating
+	# a method called "on{EventName}Done"
+	@onDone: (message, event) -> 
+		method = message.d.original
+		method = 'on' + ucfirst(method) + 'Done'
+		return @[method](message, event) if @[method]
+
+		ackMessage(message, message.d.response)
 
 	# Message handler
 	# Will run in the child frame
 	# Called when the popup iframe is ready
 	# Resolves the deferred with the document object of the popup frame
 	# (which can be accessed because it's also on widgetic.com)
-	@created: (message, event) -> ackMessage(message, event.source.frames[message.d.name].document)
+	@onCreateDone: (message, event) -> ackMessage(message, event.source.frames[message.d.name].document)
 
-	@resize: (message, event) ->
+	# Message handler
+	# Will run in the parent frame
+	# Handles 'manage' events
+	@onManage: (message, event) ->
 		name = message.d.name
 		iframe = @iframes[name]
+		
+		method = 'do' + ucfirst(message.d.do)
+		response = @[method]?(iframe, message.d)
 
-		iframe.style.width = message.d.dimensions.width + 'px'
-		iframe.style.height = message.d.dimensions.height + 'px'
+		replyMessage(message, event, response)
 
-		message.d.event = 'resized'
-		send(message, event.source)
+	# Resizes an iframe to the given dimensions
+	@doResize: (iframe, options) ->
+		iframe.style.width = options.dimensions.width + 'px'
+		iframe.style.height = options.dimensions.height + 'px'
+		return options.dimensions
 
-	@resized: (message, event) -> ackMessage(message, message.d.dimensions)
-
-	@hide: (message, event) ->
-		name = message.d.name
-		iframe = @iframes[name]
-
+	# Hides an iframe
+	@doHide: (iframe, options) -> 
 		iframe.style.display = 'none'
+		return
 
-		message.d.event = 'hidden'
-		send(message, event.source)
-
-	@hidden: (message, event) -> ackMessage(message)
-
-	@show: (message, event) ->
-		name = message.d.name
-		iframe = @iframes[name]
-
+	# Shows an iframe
+	@doShow: (iframe, options) ->
 		iframe.style.display = 'block'
-
-		message.d.event = 'shown'
-		send(message, event.source)
-
-	@shown: (message, event) -> ackMessage(message)
+		return
 
 	constructor: (options) ->
 		# parse the options
@@ -159,24 +175,28 @@ class Popup
 		promise = @_sendEvent('create')
 		return promise.then(@_prepare)
 
+	# Appends an DOMElement to the popup iframe body and requests a resize
 	append: (el) ->
 		el = el[0] if el.jquery
 		log('append', el)
 		@body.appendChild(el)
 		return @resize()
-		# @resize().then(@reposition)
 
+	# Requests a resize
 	resize: =>
 		@dimensions = {
 			width:  @body.offsetWidth
 			height: @body.offsetHeight
 		}
-		@_sendEvent('resize', { @dimensions })
+		@_sendEvent('manage', { do: 'resize', @dimensions })
 
-	hide: -> @_sendEvent('hide')
+	# Requests for the popup to be hid
+	hide: -> @_sendEvent('manage', { do: 'hide') })
 
-	show: -> @_sendEvent('show')
+	# Requests for the popup to be shown
+	show: -> @_sendEvent('manage', { do: 'show') })
 
+	# Sends an event to the parent frame with the popup name info
 	_sendEvent: (event, extra) ->
 		data = { @name, event }
 		data = extend(data, extra)
