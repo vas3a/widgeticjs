@@ -9,13 +9,26 @@ log = (text, other...) ->
 	console.debug('%c' + window.location.host + window.location.pathname + ' ' + text, 'background: #222; color: #bada55', other...)
 
 extend = (out = {}) ->
-  for arg in arguments
-    continue unless arg
+	for arg in arguments
+		continue unless arg
 
-    for key of arg
-      out[key] = arg[key] if arg.hasOwnProperty(key)
+		for key of arg
+			out[key] = arg[key] if arg.hasOwnProperty(key)
 
-  return out
+	return out
+
+debounce = (fn, t = 10) -> 
+	_delay = null
+	-> 
+		clearTimeout _delay
+		_delay = setTimeout fn, t
+
+getOffset = (el) ->
+	rect = el.getBoundingClientRect()
+	{
+		top: rect.top + document.body.scrollTop
+		left: rect.left + document.body.scrollLeft
+	}
 
 loadSheet = (url, el, callback) ->
 	link = @document.createElement 'link'
@@ -85,7 +98,7 @@ class Popup
 	# Will run in the parent frame
 	# Creates a popup iframe with the given name and register a callback
 	# to notify the caller when the iframe is ready
-	@onCreate: (message, event) ->
+	@onCreate: (message, ev) ->
 		name = message.d.name
 
 		# create the popup frame
@@ -93,16 +106,20 @@ class Popup
 		iframe.setAttribute 'class', 'wdgtc-popup'
 		iframe.setAttribute 'name', name
 		iframe.setAttribute 'style', 'border: 0; width: 0; height: 0; position: absolute; top: 0; left: 0; z-index: 1000000; display: none'
+		iframe.isVisible = false
 
 		document.querySelectorAll('body')[0].appendChild iframe
 		iframe.setAttribute 'src', config.popup + '&name=' + encodeURIComponent(name) + '&event=ready'
 		@iframes[name] = iframe
 
+		event.on window, 'resize', @doPosition.bind(@, iframe, null)
+		event.on window, 'scroll', debounce @doPosition.bind(@, iframe, null)
+
 		# save a callback for the iframe load event
 		# @see @ready
 		@callbacks[name] = =>
 			delete @callbacks[name]
-			replyMessage(message, event)
+			replyMessage(message, ev)
 
 	# Message handler
 	# Will run in the parent frame
@@ -150,13 +167,51 @@ class Popup
 
 	# Hides an iframe
 	@doHide: (iframe, options) -> 
+		iframe.isVisible = false
 		iframe.style.display = 'none'
 		return
 
 	# Shows an iframe
 	@doShow: (iframe, options) ->
+		iframe.isVisible = true
 		iframe.style.display = 'block'
 		return
+
+	@doPosition: (iframe, options) ->
+		if options
+			iframe.positionOptions = options
+		else
+			return unless iframe.positionOptions
+			return unless iframe.isVisible
+			options = iframe.positionOptions
+
+		offset = options.offset
+		popup = options.dimensions
+		anchor = extend({}, options.anchor)
+		frame = document.querySelector("iframe[name=\"#{ anchor.parent }\"]")
+
+		if frame
+			{ top, left } = getOffset(frame)
+			anchor.top  += top
+			anchor.left += left
+
+		# calculate the anchor position
+		left = window.innerWidth + document.body.scrollLeft - (anchor.left + popup.width + offset.rightMargin + offset.leftOffset)
+		left = anchor.left + offset.leftOffset + Math.min 0, left
+		left = Math.max left, anchor.left + anchor.width - popup.width
+
+		top = window.innerHeight + document.body.scrollTop - (anchor.top + anchor.height + popup.height + offset.bottomMargin)
+		top = if top >= 0 then (anchor.top + anchor.height + offset.topOffset) else (anchor.top - popup.height - offset.bottomMargin)
+		if top < 0 then top = anchor.top + anchor.height + offset.topOffset
+		
+		iframe.style.top = top + 'px'
+		iframe.style.left = left + 'px'
+		return
+
+	topOffset: 0
+	leftOffset: 0
+	rightMargin: 15
+	bottomMargin: 15
 
 	constructor: (options) ->
 		# parse the options
@@ -180,7 +235,7 @@ class Popup
 		el = el[0] if el.jquery
 		log('append', el)
 		@body.appendChild(el)
-		return @resize()
+		return @resize().then(@position)
 
 	# Requests a resize
 	resize: =>
@@ -194,7 +249,21 @@ class Popup
 	hide: -> @_sendEvent('manage', { do: 'hide' })
 
 	# Requests for the popup to be shown
-	show: -> @_sendEvent('manage', { do: 'show' })
+	show: -> @position().then => @_sendEvent('manage', { do: 'show' })
+
+	# Requests for the popup to be positioned
+	position: => 
+		log('popup.position')
+		offset = { @topOffset, @leftOffset, @bottomMargin, @rightMargin }
+		anchor = { top: 0, left: 0, width: 0, height: 0 }
+
+		if @anchor.jquery
+			anchor = @anchor.offset()
+			anchor.width  = parseInt @anchor.outerWidth(), 10
+			anchor.height = parseInt @anchor.outerHeight(), 10
+			anchor.parent = window.name
+
+		@_sendEvent('manage', { do: 'position', anchor, @dimensions, offset })
 
 	# Sends an event to the parent frame with the popup name info
 	_sendEvent: (event, extra) ->
