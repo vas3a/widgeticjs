@@ -45,7 +45,6 @@ Composition = (holder, data) ->
 	# generate a unique id and save a reference to this composition
 	@id = guid()
 	comps[@id] = @
-	url += '#' + @id
 
 	# create the iframe
 	@_iframe = document.createElement 'iframe'

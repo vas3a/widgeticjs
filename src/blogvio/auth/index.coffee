@@ -13,7 +13,7 @@ link 	= {}
 lastScope = []
 
 url = (scope=[])->
-	"#{config.auth}?client_id=#{app.id}&redirect_uri=#{app.uri}&response_type=token&scope=#{scope.join ' '}"
+	"#{config.auth}?client_id=#{app.id}&redirect_uri=#{app.uri}&response_type=token&scope=#{scope.join ' '}#oauth"
 
 auth = (interactive=true, scope) ->
 	# TODO: reject the deffered immediately if not initialized
