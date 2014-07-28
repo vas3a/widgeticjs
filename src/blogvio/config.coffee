@@ -14,6 +14,7 @@ url 	= parse script.src
 domain 	= url.hashKey['domain'] || 'blogvio.com'
 config ={
 	proxy:"//#{domain}/sdk/proxy.html#proxy",
+	popup:"//#{domain}/sdk/proxy.html#popup",
 	auth:"//#{domain}/oauth/v2/auth",
 	composition:"//#{domain}/api/v2/compositions/{id}/embed.html",
 	widget:"//#{domain}/api/v2/widgets/{id}/embed.html",

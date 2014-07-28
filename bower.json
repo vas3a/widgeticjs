@@ -1,6 +1,6 @@
 {
   "name": "blogviojs",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "authors": [
     "Blogvio <support@blogvio.com>",
     "Iulian Meghea <iulian.meghea@gmail.com>"
@@ -16,7 +16,7 @@
     "tests"
   ],
   "devDependencies": {
-    "aye": "git+https://github.com/cburgmer/ayepromise.git#master",
+    "aye": "git+https://github.com/cburgmer/ayepromise.git#1.1.1",
     "pubsub.js": "0.1.0",
     "queue-async": "*",
     "jasmine-ajax": "git+https://github.com/pivotal/jasmine-ajax.git#master",

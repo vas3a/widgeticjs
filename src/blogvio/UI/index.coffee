@@ -1,5 +1,6 @@
 Composition = require './composition'
 Editor = require './editor'
+popup = require './popup'
 parse = require './parse'
 
 composition = ->
@@ -8,6 +9,4 @@ composition = ->
 editor = ->
 	new Editor arguments...
 
-UI = {composition, editor, parse}
-
-module.exports = UI
+module.exports = {composition, editor, parse, popup}

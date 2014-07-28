@@ -24,6 +24,7 @@ receivers = {
 	'u' : Composition.connect # composition ready
 	'w' : Editor.connect # editor ready
 	'ee': Editor.event # editor event
+	'p' : UI.popup.receiver
 }
 
 receiver = (e) ->
@@ -38,7 +39,7 @@ receiver = (e) ->
 		return
 
 	try 
-		receivers[d.t]?(d)
+		receivers[d.t]?(d, e)
 	catch error
 		console.error 'Blogvio SDK: ', error.stack
 

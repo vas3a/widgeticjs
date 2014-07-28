@@ -1,6 +1,7 @@
 config  = require 'config'
 queue   = require 'queue-async'
 pubsub  = require 'pubsub.js'
+guid    = require 'utils/guid'
 
 api = require '../../api'
 
@@ -31,6 +32,7 @@ Editor = (holder, @composition, opts) ->
 	# create the editor iframe
 	@_iframe = document.createElement 'iframe'
 	@_iframe.setAttribute 'class', 'blogvio-editor'
+	@_iframe.setAttribute 'name', guid()
 	holder.appendChild @_iframe
 	@_iframe.setAttribute 'src', config.editor + '#' + @composition.id
 
