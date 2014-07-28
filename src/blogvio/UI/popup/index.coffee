@@ -62,6 +62,8 @@ ucfirst = (string) ->
 
 # Handles popup management and cross-frame popup creation
 class Popup
+	# Static
+
 	# Popups created using @new (used in child frame)
 	@popups: {}
 
@@ -108,8 +110,10 @@ class Popup
 		iframe.setAttribute 'src', config.popup + '&name=' + encodeURIComponent(name) + '&event=ready'
 		@iframes[name] = iframe
 
-		event.on window, 'resize', @doPosition.bind(@, iframe, null)
-		event.on window, 'scroll', debounce @doPosition.bind(@, iframe, null)
+		# bind on the scroll and resize events, save the handler
+		iframe.doPosition = debounce @doPosition.bind(@, iframe, null)
+		event.on window, 'resize', iframe.doPosition
+		event.on window, 'scroll', iframe.doPosition
 
 		# save a callback for the iframe load event
 		# @see @ready
@@ -205,6 +209,23 @@ class Popup
 		iframe.style.left = left + 'px'
 		return
 
+	# Removes an iframe and cleans up the memory
+	@doRelease: (iframe, options) ->
+		# remove the iframe from the DOM
+		iframe.parentNode.removeChild iframe
+		
+		# unbind the events
+		event.off window, 'resize', iframe.doPosition
+		event.off window, 'scroll', iframe.doPosition
+
+		# delete the reference
+		name = options.name
+		delete @iframes[name]
+
+		return
+
+	# Instance
+
 	topOffset: 0
 	leftOffset: 0
 	rightMargin: 15
@@ -259,6 +280,18 @@ class Popup
 			anchor.parent = window.name
 
 		@_sendEvent('manage', { do: 'position', anchor, @dimensions, offset })
+
+	# Requests for the popup to be released
+	release: ->
+		deferred = aye.defer()
+		promise = deferred.promise
+
+		# reload the iframe
+		@document.location.reload()
+
+		# send the release event after the reload finishes
+		setTimeout deferred.resolve, 1000
+		promise.then => @_sendEvent('manage', { do: 'release' })
 
 	# Sends an event to the parent frame with the popup name info
 	_sendEvent: (event, extra) ->
