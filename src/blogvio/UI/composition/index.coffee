@@ -26,7 +26,7 @@ comps  = {}
 # 			}
 # 		]
 # 	}
-Composition = (holder, data) ->
+Composition = (holder, data, brand_pos) ->
 	Blogvio.debug.timestamp 'Blogvio.UI.Composition:constructor'
 	# create the queue of messages
 	@_queue = queue(1)
@@ -42,6 +42,7 @@ Composition = (holder, data) ->
 		@setSkin data.skin if data.skin
 		@setContent data.content if data.content
 
+	url += '?bp='+brand_pos
 	# generate a unique id and save a reference to this composition
 	@id = guid()
 	comps[@id] = @
