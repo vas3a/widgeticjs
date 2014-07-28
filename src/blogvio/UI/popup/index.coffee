@@ -5,9 +5,6 @@ event = require 'utils/event'
 
 config = require 'config'
 
-log = (text, other...) ->
-	console.debug('%c' + window.location.host + window.location.pathname + ' ' + text, 'background: #222; color: #bada55', other...)
-
 extend = (out = {}) ->
 	for arg in arguments
 		continue unless arg
@@ -77,7 +74,6 @@ class Popup
 	# Used in child frame
 	# @return Promise
 	@new: (options) ->
-		log('Popup.new', window.name)
 		# create a new Popup and give it a name
 		name = guid()
 		options.name = name
@@ -177,6 +173,7 @@ class Popup
 		iframe.style.display = 'block'
 		return
 
+	# Positions an iframe according to the anchor, anchor parent and popup options
 	@doPosition: (iframe, options) ->
 		if options
 			iframe.positionOptions = options
@@ -233,7 +230,6 @@ class Popup
 	# Appends an DOMElement to the popup iframe body and requests a resize
 	append: (el) ->
 		el = el[0] if el.jquery
-		log('append', el)
 		@body.appendChild(el)
 		return @resize().then(@position)
 
@@ -253,7 +249,6 @@ class Popup
 
 	# Requests for the popup to be positioned
 	position: => 
-		log('popup.position')
 		offset = { @topOffset, @leftOffset, @bottomMargin, @rightMargin }
 		anchor = { top: 0, left: 0, width: 0, height: 0 }
 
