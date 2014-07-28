@@ -89,7 +89,6 @@ class Popup
 	@receiver: (message, event) =>
 		method = message.d.event
 		method = 'on' + ucfirst(method)
-		console?.warn 'UI.Popup: There is no handler for the event: ' + method unless @[method]		
 		@[method]?(message, event)
 
 	# Message handler
