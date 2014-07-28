@@ -1,11 +1,11 @@
-config 	 = require '../config'
-request  = require './request'
-queue 	 = require '../utils/queue'
-guid	 = require '../utils/guid'
+config  = require '../config'
+request = require './request'
+queue   = require '../utils/queue'
+guid    = require '../utils/guid'
 
-aye 	 = require 'aye'
-json	 = require 'json3'
-pubsub   = require 'pubsub.js'
+aye     = require 'aye'
+json    = require 'json3'
+pubsub  = require 'pubsub.js'
 
 
 defs 	= {}
