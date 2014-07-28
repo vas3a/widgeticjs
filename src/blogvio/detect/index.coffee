@@ -12,8 +12,8 @@ detect = (url)->
 	queryKey    = parsed.queryKey
 
 	isProxy     = hash is 'proxy'
-	isPopup     = hashKey.popup
-	isOauth     = hashKey.oauth or hashKey.access_token
+	isPopup     = hashKey.hasOwnProperty('popup')
+	isOauth     = hashKey.hasOwnProperty('oauth') or hashKey.access_token
 
 	return unless isOauth or isProxy or isPopup
 
