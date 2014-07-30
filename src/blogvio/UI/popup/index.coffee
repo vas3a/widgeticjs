@@ -58,7 +58,7 @@ replyMessage = (message, event, response) ->
 	send(message, event.source)
 
 ucfirst = (string) ->
-    string.charAt(0).toUpperCase() + string.slice(1)
+	string.charAt(0).toUpperCase() + string.slice(1)
 
 # Handles popup management and cross-frame popup creation
 class Popup
@@ -75,7 +75,7 @@ class Popup
 	# Requests the creation of a new popup frame in the parent frame
 	# Used in child frame
 	# @return Promise
-	@new: (options) ->
+	@new: (options = {}) ->
 		# create a new Popup and give it a name
 		name = guid()
 		options.name = name
@@ -110,7 +110,7 @@ class Popup
 		@iframes[name] = iframe
 
 		# bind on the scroll and resize events, save the handler
-		iframe.doPosition = debounce @doPosition.bind(@, iframe, null)
+		iframe.doPosition = debounce @doPosition.bind(@, iframe, null), 0
 		event.on window, 'resize', iframe.doPosition
 		event.on window, 'scroll', iframe.doPosition
 
@@ -308,9 +308,9 @@ class Popup
 		@head = document.getElementsByTagName('head')[0]
 
 		# load the styles
-		styles = '<style type="text/css">body{display:inline-block;margin:0;width:auto !important;height:auto !important}</style>'
+		styles = '<style type="text/css">body{display:inline-block;margin:0;width:auto !important;height:auto !important;overflow:hidden;background:transparent !important}</style>'
 		@head.insertAdjacentHTML 'beforeend', styles
-		loadSheet sheet, @head, @resize for sheet in @css
+		loadSheet sheet, @head, @resize for sheet in @css if @css
 
 		return @
 
