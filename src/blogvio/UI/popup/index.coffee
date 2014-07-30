@@ -264,10 +264,16 @@ class Popup
 		return promise.then(@_prepare)
 
 	# Appends an DOMElement to the popup iframe body and requests a resize
+	# Replaces the iframe content
 	append: (el) ->
 		el = el[0] if el.jquery
+
+		@body.innerHTML = '';
 		@body.appendChild(el)
+
+		@styles = {}
 		@_updateCachedStyles(el)
+
 		return @resize().then(@position)
 
 	# Requests a resize
