@@ -60,6 +60,16 @@ replyMessage = (message, event, response) ->
 ucfirst = (string) ->
 	string.charAt(0).toUpperCase() + string.slice(1)
 
+getCssValue = (el, property) ->
+	return undefined unless el
+	value = window
+		.getComputedStyle(el)
+		.getPropertyCSSValue(property)
+		.cssText 
+
+	return undefined if value is 'none'
+	return value
+
 # Handles popup management and cross-frame popup creation
 class Popup
 	# Static
@@ -162,6 +172,10 @@ class Popup
 	@doResize: (iframe, options) ->
 		iframe.style.width = options.dimensions.width + 'px'
 		iframe.style.height = options.dimensions.height + 'px'
+
+		iframe.style.boxShadow = options.dimensions.shadow if options.dimensions.shadow
+		iframe.style.borderRadius = options.dimensions.borderRadius if options.dimensions.borderRadius
+
 		return options.dimensions
 
 	# Hides an iframe
@@ -259,6 +273,8 @@ class Popup
 		@dimensions = {
 			width:  @body.offsetWidth
 			height: @body.offsetHeight
+			shadow: getCssValue(@body.children[0], 'box-shadow')
+			borderRadius: getCssValue(@body.children[0], 'border-radius')
 		}
 		@_sendEvent('manage', { do: 'resize', @dimensions })
 
