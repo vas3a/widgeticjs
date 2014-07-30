@@ -238,6 +238,7 @@ class Popup
 			@[key] = value
 
 		@dimensions = { width: 0, height: 0 }
+		@visible = false
 
 	# Sends a message to the parent frame to create an iframe
 	# Used in child frame
@@ -262,10 +263,10 @@ class Popup
 		@_sendEvent('manage', { do: 'resize', @dimensions })
 
 	# Requests for the popup to be hid
-	hide: -> @_sendEvent('manage', { do: 'hide' })
+	hide: -> @_sendEvent('manage', { do: 'hide' }).then => @visible = false
 
 	# Requests for the popup to be shown
-	show: -> @position().then => @_sendEvent('manage', { do: 'show' })
+	show: -> @position().then => @_sendEvent('manage', { do: 'show' }).then => @visible = true
 
 	# Requests for the popup to be positioned
 	position: => 
