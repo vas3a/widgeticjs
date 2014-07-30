@@ -253,6 +253,7 @@ class Popup
 
 		@dimensions = { width: 0, height: 0 }
 		@visible = false
+		@styles = {}
 
 	# Sends a message to the parent frame to create an iframe
 	# Used in child frame
@@ -266,6 +267,7 @@ class Popup
 	append: (el) ->
 		el = el[0] if el.jquery
 		@body.appendChild(el)
+		@_updateCachedStyles(el)
 		return @resize().then(@position)
 
 	# Requests a resize
@@ -273,8 +275,8 @@ class Popup
 		@dimensions = {
 			width:  @body.offsetWidth
 			height: @body.offsetHeight
-			shadow: getCssValue(@body.children[0], 'box-shadow')
-			borderRadius: getCssValue(@body.children[0], 'border-radius')
+			shadow: @styles['box-shadow']
+			borderRadius: @styles['border-radius']
 		}
 		@_sendEvent('manage', { do: 'resize', @dimensions })
 
@@ -327,8 +329,19 @@ class Popup
 		# load the styles
 		styles = '<style type="text/css">body{display:inline-block;margin:0;width:auto !important;height:auto !important;overflow:hidden;background:transparent !important}</style>'
 		@head.insertAdjacentHTML 'beforeend', styles
-		loadSheet sheet, @head, @resize for sheet in @css if @css
+		
+		onLoad = =>			
+			@_updateCachedStyles(@body.children[0]) if @body.children[0]
+			@resize()
+		loadSheet sheet, @head, onLoad for sheet in @css if @css
 
 		return @
+
+	_updateCachedStyles: (el) ->		
+		@_cacheStyle(el, 'box-shadow')
+		@_cacheStyle(el, 'border-radius')
+
+	_cacheStyle: (el, value) -> 
+		@styles[value] = getCssValue(el, value)
 
 module.exports = Popup
