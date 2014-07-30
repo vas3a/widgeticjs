@@ -152,9 +152,9 @@ class Popup
 	# Message handler
 	# Will run in the child frame
 	# Called when the popup iframe is ready
-	# Resolves the deferred with the document object of the popup frame
+	# Resolves the deferred with the window object of the popup frame
 	# (which can be accessed because it's also on widgetic.com)
-	@onCreateDone: (message, event) -> ackMessage(message, event.source.frames[message.d.name].document)
+	@onCreateDone: (message, event) -> ackMessage(message, event.source.frames[message.d.name])
 
 	# Message handler
 	# Will run in the parent frame
@@ -326,16 +326,16 @@ class Popup
 		return promise
 
 	# Caches relevant nodes from the iframe and styles the contents
-	_prepare: (document) =>
+	_prepare: (@window) =>
 		# save the document and important nodes
-		@document = document
-		@body = document.getElementsByTagName('body')[0]
-		@head = document.getElementsByTagName('head')[0]
+		@document = @window.document
+		@body = @document.getElementsByTagName('body')[0]
+		@head = @document.getElementsByTagName('head')[0]
 
 		# load the styles
 		styles = '<style type="text/css">body{display:inline-block;margin:0;width:auto !important;height:auto !important;overflow:hidden;background:transparent !important}</style>'
 		@head.insertAdjacentHTML 'beforeend', styles
-		
+
 		onLoad = =>			
 			@_updateCachedStyles(@body.children[0]) if @body.children[0]
 			@resize()
