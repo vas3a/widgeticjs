@@ -65,8 +65,10 @@ getCssValue = (el, property) ->
 	value = window
 		.getComputedStyle(el)
 		.getPropertyCSSValue(property)
-		.cssText 
-
+	
+	return undefined unless value
+	
+	value = value.cssText 
 	return undefined if value is 'none'
 	return value
 
@@ -112,7 +114,7 @@ class Popup
 		iframe = document.createElement 'iframe'
 		iframe.setAttribute 'class', 'wdgtc-popup'
 		iframe.setAttribute 'name', name
-		iframe.setAttribute 'style', 'border: 0; width: 0; height: 0; position: absolute; top: 0; left: 0; z-index: 1000000; display: none'
+		iframe.setAttribute 'style', 'border: 0; width: 0; height: 0; position: absolute; top: 0; left: -10000px; z-index: 2147483647;'
 		iframe.isVisible = false
 
 		document.querySelectorAll('body')[0].appendChild iframe
@@ -274,7 +276,7 @@ class Popup
 		@styles = {}
 		@_updateCachedStyles(el)
 
-		return @resize().then(@position)
+		return @resize()
 
 	# Requests a resize
 	resize: =>
@@ -345,6 +347,7 @@ class Popup
 
 	_updateCachedStyles: (el) ->		
 		@_cacheStyle(el, 'box-shadow')
+		# TODO: check what's happening to border-radius on firefox (missing)
 		@_cacheStyle(el, 'border-radius')
 
 	_cacheStyle: (el, value) -> 
