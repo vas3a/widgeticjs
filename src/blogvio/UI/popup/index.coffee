@@ -58,7 +58,19 @@ replyMessage = (message, event, response) ->
 	send(message, event.source)
 
 ucfirst = (string) ->
-    string.charAt(0).toUpperCase() + string.slice(1)
+	string.charAt(0).toUpperCase() + string.slice(1)
+
+getCssValue = (el, property) ->
+	return undefined unless el
+	value = window
+		.getComputedStyle(el)
+		.getPropertyCSSValue(property)
+	
+	return undefined unless value
+	
+	value = value.cssText 
+	return undefined if value is 'none'
+	return value
 
 # Handles popup management and cross-frame popup creation
 class Popup
@@ -75,7 +87,7 @@ class Popup
 	# Requests the creation of a new popup frame in the parent frame
 	# Used in child frame
 	# @return Promise
-	@new: (options) ->
+	@new: (options = {}) ->
 		# create a new Popup and give it a name
 		name = guid()
 		options.name = name
@@ -102,7 +114,7 @@ class Popup
 		iframe = document.createElement 'iframe'
 		iframe.setAttribute 'class', 'wdgtc-popup'
 		iframe.setAttribute 'name', name
-		iframe.setAttribute 'style', 'border: 0; width: 0; height: 0; position: absolute; top: 0; left: 0; z-index: 1000000; display: none'
+		iframe.setAttribute 'style', 'border: 0; width: 0; height: 0; position: absolute; top: 0; left: -10000px; z-index: 2147483647;'
 		iframe.isVisible = false
 
 		document.querySelectorAll('body')[0].appendChild iframe
@@ -110,7 +122,7 @@ class Popup
 		@iframes[name] = iframe
 
 		# bind on the scroll and resize events, save the handler
-		iframe.doPosition = debounce @doPosition.bind(@, iframe, null)
+		iframe.doPosition = debounce @doPosition.bind(@, iframe, null), 0
 		event.on window, 'resize', iframe.doPosition
 		event.on window, 'scroll', iframe.doPosition
 
@@ -142,9 +154,9 @@ class Popup
 	# Message handler
 	# Will run in the child frame
 	# Called when the popup iframe is ready
-	# Resolves the deferred with the document object of the popup frame
+	# Resolves the deferred with the window object of the popup frame
 	# (which can be accessed because it's also on widgetic.com)
-	@onCreateDone: (message, event) -> ackMessage(message, event.source.frames[message.d.name].document)
+	@onCreateDone: (message, event) -> ackMessage(message, event.source.frames[message.d.name])
 
 	# Message handler
 	# Will run in the parent frame
@@ -162,6 +174,10 @@ class Popup
 	@doResize: (iframe, options) ->
 		iframe.style.width = options.dimensions.width + 'px'
 		iframe.style.height = options.dimensions.height + 'px'
+
+		iframe.style.boxShadow = options.dimensions.shadow if options.dimensions.shadow
+		iframe.style.borderRadius = options.dimensions.borderRadius if options.dimensions.borderRadius
+
 		return options.dimensions
 
 	# Hides an iframe
@@ -238,6 +254,8 @@ class Popup
 			@[key] = value
 
 		@dimensions = { width: 0, height: 0 }
+		@visible = false
+		@styles = {}
 
 	# Sends a message to the parent frame to create an iframe
 	# Used in child frame
@@ -248,24 +266,33 @@ class Popup
 		return promise.then(@_prepare)
 
 	# Appends an DOMElement to the popup iframe body and requests a resize
+	# Replaces the iframe content
 	append: (el) ->
 		el = el[0] if el.jquery
+
+		@body.innerHTML = '';
 		@body.appendChild(el)
-		return @resize().then(@position)
+
+		@styles = {}
+		@_updateCachedStyles(el)
+
+		return @resize()
 
 	# Requests a resize
 	resize: =>
 		@dimensions = {
 			width:  @body.offsetWidth
 			height: @body.offsetHeight
+			shadow: @styles['box-shadow']
+			borderRadius: @styles['border-radius']
 		}
 		@_sendEvent('manage', { do: 'resize', @dimensions })
 
 	# Requests for the popup to be hid
-	hide: -> @_sendEvent('manage', { do: 'hide' })
+	hide: -> @_sendEvent('manage', { do: 'hide' }).then => @visible = false
 
 	# Requests for the popup to be shown
-	show: -> @position().then => @_sendEvent('manage', { do: 'show' })
+	show: -> @position().then => @_sendEvent('manage', { do: 'show' }).then => @visible = true
 
 	# Requests for the popup to be positioned
 	position: => 
@@ -301,17 +328,29 @@ class Popup
 		return promise
 
 	# Caches relevant nodes from the iframe and styles the contents
-	_prepare: (document) =>
+	_prepare: (@window) =>
 		# save the document and important nodes
-		@document = document
-		@body = document.getElementsByTagName('body')[0]
-		@head = document.getElementsByTagName('head')[0]
+		@document = @window.document
+		@body = @document.getElementsByTagName('body')[0]
+		@head = @document.getElementsByTagName('head')[0]
 
 		# load the styles
-		styles = '<style type="text/css">body{display:inline-block;margin:0;width:auto !important;height:auto !important}</style>'
+		styles = '<style type="text/css">body{display:inline-block;margin:0;width:auto !important;height:auto !important;overflow:hidden;background:transparent !important}</style>'
 		@head.insertAdjacentHTML 'beforeend', styles
-		loadSheet sheet, @head, @resize for sheet in @css
+
+		onLoad = =>			
+			@_updateCachedStyles(@body.children[0]) if @body.children[0]
+			@resize()
+		loadSheet sheet, @head, onLoad for sheet in @css if @css
 
 		return @
+
+	_updateCachedStyles: (el) ->		
+		@_cacheStyle(el, 'box-shadow')
+		# TODO: check what's happening to border-radius on firefox (missing)
+		@_cacheStyle(el, 'border-radius')
+
+	_cacheStyle: (el, value) -> 
+		@styles[value] = getCssValue(el, value)
 
 module.exports = Popup
