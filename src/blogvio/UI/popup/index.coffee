@@ -245,6 +245,7 @@ class Popup
 	leftOffset: 0
 	rightMargin: 15
 	bottomMargin: 15
+	copyStyles: true
 
 	constructor: (options) ->
 		# parse the options
@@ -345,7 +346,8 @@ class Popup
 
 		return @
 
-	_updateCachedStyles: (el) ->		
+	_updateCachedStyles: (el) ->
+		return unless @copyStyles
 		@_cacheStyle(el, 'box-shadow')
 		# TODO: check what's happening to border-radius on firefox (missing)
 		@_cacheStyle(el, 'border-radius')
