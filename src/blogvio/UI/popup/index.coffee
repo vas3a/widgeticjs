@@ -89,7 +89,7 @@ class Popup
 	# @return Promise
 	@new: (options = {}) ->
 		# create a new Popup and give it a name
-		name = guid()
+		name = options.name || guid()
 		options.name = name
 		@popups[name] = new Popup options
 
