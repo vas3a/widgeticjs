@@ -16,7 +16,9 @@ url = (scope=[])->
 	"#{config.auth}?client_id=#{app.id}&redirect_uri=#{app.uri}&response_type=token&scope=#{scope.join ' '}#oauth"
 
 auth = (interactive=true, scope) ->
-	# TODO: reject the deffered immediately if not initialized
+	unless app.id and app.uri
+		throw new Error 'Blogvio must be initialized with client id and redirect uri!'
+
 	deffered = aye.defer()
 	
 	oa = if interactive  then popup else iframe
@@ -33,6 +35,8 @@ auth = (interactive=true, scope) ->
 auth.setAuthOptions = (id,uri,root)->
 	app.id = id
 	app.uri = uri
+
+auth.getClientId = -> app.id
 
 auth.connect = (response)->
 	data = response.d
