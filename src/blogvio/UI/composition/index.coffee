@@ -42,7 +42,19 @@ Composition = (holder, data, brand_pos) ->
 		@setSkin data.skin if data.skin
 		@setContent data.content if data.content
 
-	url += '?bp='+brand_pos
+	query = []
+
+	brand_pos or= data.brand_pos
+	query.push 'bp='+brand_pos if brand_pos
+
+	token = Blogvio.auth.token()
+	if data.widget_id? and not token
+		throw new Error 'You must be logged in to use dynamic compositions!'
+
+	query.push 'access_token='+Blogvio.auth.token() if token
+
+	url += '?'+query.join '&' if query.length
+
 	# generate a unique id and save a reference to this composition
 	@id = guid()
 	comps[@id] = @
