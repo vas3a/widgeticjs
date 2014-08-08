@@ -1,6 +1,8 @@
 config = require 'config'
 guid   = require 'utils/guid'
 queue  = require 'queue-async'
+api    = require '../../api'
+auth   = require '../../auth'
 
 # Holds references to created compositions
 comps  = {}
@@ -47,11 +49,12 @@ Composition = (holder, data, brand_pos) ->
 	brand_pos or= data.brand_pos
 	query.push 'bp='+brand_pos if brand_pos
 
-	token = Blogvio.auth.token()
-	if data.widget_id? and not token
-		throw new Error 'You must be logged in to use dynamic compositions!'
+	client_id = auth.getClientId()
+	if data.widget_id? and not client_id
+		throw new Error 'Blogvio should be initialized before using the UI.Composition!'
 
-	query.push 'access_token='+Blogvio.auth.token() if token
+	query.push 'access_token='+token if token = api.accessToken()
+	query.push 'client_id='+client_id if client_id
 
 	url += '?'+query.join '&' if query.length
 

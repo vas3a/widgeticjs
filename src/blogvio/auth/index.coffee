@@ -36,6 +36,8 @@ auth.setAuthOptions = (id,uri,root)->
 	app.id = id
 	app.uri = uri
 
+auth.getClientId = -> app.id
+
 auth.connect = (response)->
 	data = response.d
 	if data and data.access_token
