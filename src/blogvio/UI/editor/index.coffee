@@ -23,6 +23,7 @@ Editor = (holder, @composition, opts) ->
 
 	@setEditorOptions opts if opts
 
+	@composition.queue => @composition._iframe.contentWindow.waitEditorInit = true
 	# register @_compReady as a callback for when the composition is ready
 	@composition.queue(@_compReady.bind(this))
 
