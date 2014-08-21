@@ -64,12 +64,9 @@ getCssValue = (el, property) ->
 	return undefined unless el
 	value = window
 		.getComputedStyle(el)
-		.getPropertyCSSValue(property)
+		.getPropertyValue(property)
 	
 	return undefined unless value
-	
-	value = value.cssText 
-	return undefined if value is 'none'
 	return value
 
 # Handles popup management and cross-frame popup creation
