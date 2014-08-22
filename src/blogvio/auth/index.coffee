@@ -16,10 +16,11 @@ url = (scope=[])->
 	"#{config.auth}?client_id=#{app.id}&redirect_uri=#{app.uri}&response_type=token&scope=#{scope.join ' '}#oauth"
 
 auth = (interactive=true, scope) ->
-	unless app.id and app.uri
-		throw new Error 'Blogvio must be initialized with client id and redirect uri!'
-
 	deffered = aye.defer()
+
+	unless app.id and app.uri
+		deffered.reject 'Blogvio must be initialized with client id and redirect uri!'
+		return deffered.promise
 	
 	oa = if interactive  then popup else iframe
 
