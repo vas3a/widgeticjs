@@ -336,12 +336,19 @@ class Popup
 		styles = '<style type="text/css">body{display:inline-block;margin:0;width:auto !important;height:auto !important;overflow:hidden;background:transparent !important}</style>'
 		@head.insertAdjacentHTML 'beforeend', styles
 
-		onLoad = =>			
-			@_updateCachedStyles(@body.children[0]) if @body.children[0]
-			@resize()
-		loadSheet sheet, @head, onLoad for sheet in @css if @css
+		# the popup creation is done, unless we have stylesheets to load
+		return @ unless @css
 
-		return @
+		# we will return a promise to notify when all the stylesheets have loaded
+		allSheetsLoaded = aye.defer()
+
+		loadedSheets = 0
+		onLoad = => if ++loadedSheets is @css.length then allSheetsLoaded.resolve()
+		loadSheet sheet, @head, onLoad for sheet in @css
+
+		return allSheetsLoaded.promise.then =>
+			@_updateCachedStyles(@body.children[0]) if @body.children[0]
+			@resize().then => return @
 
 	_updateCachedStyles: (el) ->
 		return unless @copyStyles
