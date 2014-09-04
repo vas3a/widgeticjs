@@ -69,6 +69,12 @@ getCssValue = (el, property) ->
 	return undefined unless value
 	return value
 
+getTextFromStyleElement = (el) ->
+	try
+		el.innerHTML
+	catch
+		el.styleSheet.cssText
+
 # Handles popup management and cross-frame popup creation
 class Popup
 	# Static
@@ -279,6 +285,26 @@ class Popup
 
 		return @resize()
 
+	style: (text, preserve = false) ->
+		unless @styleElement
+			@styleElement = document.createElement('style')
+			@head.appendChild @styleElement
+
+		@preservedStyles ?= ''
+
+		try
+			@styleElement.innerHTML = @preservedStyles + text
+		catch
+			@styleElement.styleSheet.cssText = @preservedStyles + text
+
+		@preservedStyles += text if preserve 
+
+		# send a resolved deferred to keep the API consistent
+		deferred = aye.defer()
+		deferred.resolve(@preservedStyles + text)
+		return deferred.promise
+
+
 	# Requests a resize
 	resize: =>
 		@dimensions = {
@@ -336,6 +362,12 @@ class Popup
 		# load the styles
 		styles = '<style type="text/css">body{display:inline-block;margin:0;width:auto !important;height:auto !important;overflow:hidden;background:transparent !important}</style>'
 		@head.insertAdjacentHTML 'beforeend', styles
+
+		# copy over widget-styles
+		styles = document.querySelectorAll '[data-widget-style=true]'
+		styles = Array::map.call styles, getTextFromStyleElement
+		styles = styles.reduce ( (previous, current) -> previous += current ), ''
+		@style(styles, true)
 
 		# the popup creation is done, unless we have stylesheets to load
 		return @ unless @css
