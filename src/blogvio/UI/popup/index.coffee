@@ -251,6 +251,9 @@ class Popup
 		for key, value of @options
 			@[key] = value
 
+		@anchor ?= document.body		
+		@anchor = @anchor[0] if @anchor.jquery
+
 		@dimensions = { width: 0, height: 0 }
 		@visible = false
 		@styles = {}
@@ -295,13 +298,11 @@ class Popup
 	# Requests for the popup to be positioned
 	position: => 
 		offset = { @topOffset, @leftOffset, @bottomMargin, @rightMargin }
-		anchor = { top: 0, left: 0, width: 0, height: 0 }
 
-		if @anchor.jquery
-			anchor = @anchor.offset()
-			anchor.width  = parseInt @anchor.outerWidth(), 10
-			anchor.height = parseInt @anchor.outerHeight(), 10
-			anchor.parent = window.name
+		anchor = getOffset(@anchor)
+		anchor.parent = window.name
+		anchor.width  = parseInt @anchor.offsetWidth, 10
+		anchor.height = parseInt @anchor.offsetHeight, 10
 
 		@_sendEvent('manage', { do: 'position', anchor, @dimensions, offset })
 
