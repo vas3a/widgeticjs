@@ -346,6 +346,10 @@ class Popup
 		loadedSheets = 0
 		onLoad = => if ++loadedSheets is @css.length then allSheetsLoaded.resolve()
 		loadSheet sheet, @head, onLoad for sheet in @css
+		setTimeout allSheetsLoaded.reject.bind(
+				null, new Error('Popup could not be created because CSS did not load')
+			),
+			10000 # assume the css won't load if more than 10 seconds pass
 
 		return allSheetsLoaded.promise.then =>
 			@_updateCachedStyles(@body.children[0]) if @body.children[0]
