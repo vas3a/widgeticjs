@@ -78,6 +78,29 @@ getTextFromStyleElement = (el) ->
 # Handles popup management and cross-frame popup creation
 class Popup
 	# Static
+	@styles: {
+		popup: '
+			body {
+				display:inline-block;
+				margin:0;
+				width:auto !important;
+				height:auto !important;
+				overflow:hidden;
+				background:transparent !important
+			}
+		'
+		overlay: '
+			html, body {
+				width:100%;
+				height:100%;
+			}
+			body {
+				display:block;
+				margin:0;
+				overflow:hidden;
+			}
+		'
+	}
 
 	# Popups created using @new (used in child frame)
 	@popups: {}
@@ -117,7 +140,9 @@ class Popup
 		iframe = document.createElement 'iframe'
 		iframe.setAttribute 'class', 'wdgtc-popup'
 		iframe.setAttribute 'name', name
-		iframe.setAttribute 'style', 'border: 0; width: 0; height: 0; position: absolute; top: 0; left: -10000px; z-index: 2147483647;'
+		iframe.isOverlay = message.d.type is 'overlay'
+		iframe.setAttribute 'style', 'border: 0; width: 0; height: 0; position: absolute; top: 0; left: -10000px; z-index: 2147483646;'
+		iframe.style.zIndex = 2147483647 if iframe.isOverlay # keep overlays over popups
 		iframe.isVisible = false
 
 		document.querySelectorAll('body')[0].appendChild iframe
@@ -175,6 +200,8 @@ class Popup
 
 	# Resizes an iframe to the given dimensions
 	@doResize: (iframe, options) ->
+		return options.dimensions if iframe.isOverlay
+
 		iframe.style.width = options.dimensions.width + 'px'
 		iframe.style.height = options.dimensions.height + 'px'
 
@@ -192,16 +219,28 @@ class Popup
 	# Shows an iframe
 	@doShow: (iframe, options) ->
 		iframe.isVisible = true
-		iframe.style.display = 'block'
+		iframe.style.display  = 'block'
+		iframe.style.position = if iframe.isOverlay then 'fixed' else 'absolute'
 		return
 
 	# Positions an iframe according to the anchor, anchor parent and popup options
 	@doPosition: (iframe, options) ->
+		iframe.style.display = "none" unless iframe.isVisible
+
+		if iframe.isOverlay
+			iframe.style.position = 'fixed'
+			iframe.style.width   = '100%'
+			iframe.style.height  = '100%'
+			iframe.style.top     = 0
+			iframe.style.left    = 0
+			iframe.style.bottom  = 0
+			iframe.style.right   = 0
+			return
+
 		if options
 			iframe.positionOptions = options
 		else
 			return unless iframe.positionOptions
-			return unless iframe.isVisible
 			options = iframe.positionOptions
 
 		offset = options.offset
@@ -244,6 +283,7 @@ class Popup
 
 	# Instance
 
+	type: 'popup'
 	topOffset: 0
 	leftOffset: 0
 	rightMargin: 15
@@ -269,7 +309,7 @@ class Popup
 	# Returns a promise that will be resolved
 	# when the iframe has loaded (@see @created)
 	init: ->
-		promise = @_sendEvent('create')
+		promise = @_sendEvent('create', { @type })
 		return promise.then(@_prepare)
 
 	# Appends an DOMElement to the popup iframe body and requests a resize
@@ -360,7 +400,7 @@ class Popup
 		@head = @document.getElementsByTagName('head')[0]
 
 		# load the styles
-		styles = '<style type="text/css">body{display:inline-block;margin:0;width:auto !important;height:auto !important;overflow:hidden;background:transparent !important}</style>'
+		styles = '<style type="text/css">' + Popup.styles[@type] + '</style>'
 		@head.insertAdjacentHTML 'beforeend', styles
 
 		# copy over widget-styles
