@@ -69,9 +69,38 @@ getCssValue = (el, property) ->
 	return undefined unless value
 	return value
 
+getTextFromStyleElement = (el) ->
+	try
+		el.innerHTML
+	catch
+		el.styleSheet.cssText
+
 # Handles popup management and cross-frame popup creation
 class Popup
 	# Static
+	@styles: {
+		popup: '
+			body {
+				display:inline-block;
+				margin:0;
+				width:auto !important;
+				height:auto !important;
+				overflow:hidden;
+				background:transparent !important
+			}
+		'
+		overlay: '
+			html, body {
+				width:100%;
+				height:100%;
+			}
+			body {
+				display:block;
+				margin:0;
+				overflow:hidden;
+			}
+		'
+	}
 
 	# Popups created using @new (used in child frame)
 	@popups: {}
@@ -111,7 +140,9 @@ class Popup
 		iframe = document.createElement 'iframe'
 		iframe.setAttribute 'class', 'wdgtc-popup'
 		iframe.setAttribute 'name', name
-		iframe.setAttribute 'style', 'border: 0; width: 0; height: 0; position: absolute; top: 0; left: -10000px; z-index: 2147483647;'
+		iframe.isOverlay = message.d.type is 'overlay'
+		iframe.setAttribute 'style', 'border: 0; width: 0; height: 0; position: absolute; top: 0; left: -10000px; z-index: 2147483646;'
+		iframe.style.zIndex = 2147483647 if iframe.isOverlay # keep overlays over popups
 		iframe.isVisible = false
 
 		document.querySelectorAll('body')[0].appendChild iframe
@@ -169,6 +200,8 @@ class Popup
 
 	# Resizes an iframe to the given dimensions
 	@doResize: (iframe, options) ->
+		return options.dimensions if iframe.isOverlay
+
 		iframe.style.width = options.dimensions.width + 'px'
 		iframe.style.height = options.dimensions.height + 'px'
 
@@ -186,16 +219,28 @@ class Popup
 	# Shows an iframe
 	@doShow: (iframe, options) ->
 		iframe.isVisible = true
-		iframe.style.display = 'block'
+		iframe.style.display  = 'block'
+		iframe.style.position = if iframe.isOverlay then 'fixed' else 'absolute'
 		return
 
 	# Positions an iframe according to the anchor, anchor parent and popup options
 	@doPosition: (iframe, options) ->
+		iframe.style.display = "none" unless iframe.isVisible
+
+		if iframe.isOverlay
+			iframe.style.position = 'fixed'
+			iframe.style.width   = '100%'
+			iframe.style.height  = '100%'
+			iframe.style.top     = 0
+			iframe.style.left    = 0
+			iframe.style.bottom  = 0
+			iframe.style.right   = 0
+			return
+
 		if options
 			iframe.positionOptions = options
 		else
 			return unless iframe.positionOptions
-			return unless iframe.isVisible
 			options = iframe.positionOptions
 
 		offset = options.offset
@@ -238,6 +283,7 @@ class Popup
 
 	# Instance
 
+	type: 'popup'
 	topOffset: 0
 	leftOffset: 0
 	rightMargin: 15
@@ -251,6 +297,9 @@ class Popup
 		for key, value of @options
 			@[key] = value
 
+		@anchor ?= document.body		
+		@anchor = @anchor[0] if @anchor.jquery
+
 		@dimensions = { width: 0, height: 0 }
 		@visible = false
 		@styles = {}
@@ -260,7 +309,7 @@ class Popup
 	# Returns a promise that will be resolved
 	# when the iframe has loaded (@see @created)
 	init: ->
-		promise = @_sendEvent('create')
+		promise = @_sendEvent('create', { @type })
 		return promise.then(@_prepare)
 
 	# Appends an DOMElement to the popup iframe body and requests a resize
@@ -275,6 +324,26 @@ class Popup
 		@_updateCachedStyles(el)
 
 		return @resize()
+
+	style: (text, preserve = false) ->
+		unless @styleElement
+			@styleElement = document.createElement('style')
+			@head.appendChild @styleElement
+
+		@preservedStyles ?= ''
+
+		try
+			@styleElement.innerHTML = @preservedStyles + text
+		catch
+			@styleElement.styleSheet.cssText = @preservedStyles + text
+
+		@preservedStyles += text if preserve 
+
+		# send a resolved deferred to keep the API consistent
+		deferred = aye.defer()
+		deferred.resolve(@preservedStyles + text)
+		return deferred.promise
+
 
 	# Requests a resize
 	resize: =>
@@ -295,13 +364,11 @@ class Popup
 	# Requests for the popup to be positioned
 	position: => 
 		offset = { @topOffset, @leftOffset, @bottomMargin, @rightMargin }
-		anchor = { top: 0, left: 0, width: 0, height: 0 }
 
-		if @anchor.jquery
-			anchor = @anchor.offset()
-			anchor.width  = parseInt @anchor.outerWidth(), 10
-			anchor.height = parseInt @anchor.outerHeight(), 10
-			anchor.parent = window.name
+		anchor = getOffset(@anchor)
+		anchor.parent = window.name
+		anchor.width  = parseInt @anchor.offsetWidth, 10
+		anchor.height = parseInt @anchor.offsetHeight, 10
 
 		@_sendEvent('manage', { do: 'position', anchor, @dimensions, offset })
 
@@ -333,15 +400,32 @@ class Popup
 		@head = @document.getElementsByTagName('head')[0]
 
 		# load the styles
-		styles = '<style type="text/css">body{display:inline-block;margin:0;width:auto !important;height:auto !important;overflow:hidden;background:transparent !important}</style>'
+		styles = '<style type="text/css">' + Popup.styles[@type] + '</style>'
 		@head.insertAdjacentHTML 'beforeend', styles
 
-		onLoad = =>			
-			@_updateCachedStyles(@body.children[0]) if @body.children[0]
-			@resize()
-		loadSheet sheet, @head, onLoad for sheet in @css if @css
+		# copy over widget-styles
+		styles = document.querySelectorAll '[data-widget-style=true]'
+		styles = Array::map.call styles, getTextFromStyleElement
+		styles = styles.reduce ( (previous, current) -> previous += current ), ''
+		@style(styles, true)
 
-		return @
+		# the popup creation is done, unless we have stylesheets to load
+		return @ unless @css
+
+		# we will return a promise to notify when all the stylesheets have loaded
+		allSheetsLoaded = aye.defer()
+
+		loadedSheets = 0
+		onLoad = => if ++loadedSheets is @css.length then allSheetsLoaded.resolve()
+		loadSheet sheet, @head, onLoad for sheet in @css
+		setTimeout allSheetsLoaded.reject.bind(
+				null, new Error('Popup could not be created because CSS did not load')
+			),
+			10000 # assume the css won't load if more than 10 seconds pass
+
+		return allSheetsLoaded.promise.then =>
+			@_updateCachedStyles(@body.children[0]) if @body.children[0]
+			@resize().then => return @
 
 	_updateCachedStyles: (el) ->
 		return unless @copyStyles
