@@ -55,6 +55,7 @@ Composition = (holder, data, brand_pos) ->
 
 	query.push 'access_token='+token if token = api.accessToken()
 	query.push 'client_id='+client_id if client_id
+	query.push 'wait' if data.wait_editor_init
 
 	url += '?'+query.join '&' if query.length
 
