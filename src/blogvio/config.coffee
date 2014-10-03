@@ -11,7 +11,7 @@ deriveScriptElement = ->
 
 script 	= deriveScriptElement()
 url 	= parse script.src
-domain 	= url.hashKey['domain'] || 'blogvio.com'
+domain 	= url.hashKey['domain'] || 'widgetic.com'
 config ={
 	proxy:"//#{domain}/sdk/proxy.html#proxy",
 	popup:"//#{domain}/sdk/proxy.html#popup",
