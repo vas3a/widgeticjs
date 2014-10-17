@@ -71,6 +71,10 @@ embed = (el) ->
 	el = replaceParentWithChild(el)
 	holder = getHolder(el)
 	composition = new Blogvio.UI.composition(holder, options.id, options.brand_pos)
-	composition._iframe.setAttribute 'style', 'position:absolute;top:0;left:0;width:100%; height:100%;'
+	composition._iframe.setAttribute 'style', 'position:absolute;top:0;left:0;width:100%;height:100%;'
+	# prevent flash of white while the iframe loads
+	composition._iframe.style.visibility = 'hidden'
+	composition._iframe.onload = =>
+		composition._iframe.style.visibility = 'visible'
 
 module.exports = parse
