@@ -1,6 +1,6 @@
 {
   "name": "blogviojs",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Blogvio Javascript SDK",
   "main": "lib/sdk.js",
   "scripts": {
@@ -10,8 +10,16 @@
     "type": "git",
     "url": "https://github.com/blogvio/blogviojs.git"
   },
-  "author": "Blogvio <support@blogvio.com>",
+  "author": "Widgetic <support@widgetic.com>",
   "contributors": [
+    {
+      "name": "Cristian Necula",
+      "email": "cristian.necula@vuzum.com",
+    },
+    {
+      "name": "Vasilica Olariu",
+      "email": "vasilica.olariu@vuzum.com",
+    },
     {
       "name": "Iulian Meghea",
       "email": "iulian.meghea@gmail.com"
