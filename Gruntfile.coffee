@@ -94,6 +94,7 @@ module.exports 	= (grunt)->
 			}]
 			server:
 				options:
+        			protocol: 'https'
 					middleware:(connect)->[proxySnippet,mountFolder(connect,'./lib')]
 	)
 	grunt.loadNpmTasks 'grunt-notify'
