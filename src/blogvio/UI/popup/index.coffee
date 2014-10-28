@@ -144,6 +144,8 @@ class Popup
 		iframe.setAttribute 'style', 'border: 0; width: 0; height: 0; position: absolute; top: 0; left: -10000px; z-index: 2147483646;'
 		iframe.style.zIndex = 2147483647 if iframe.isOverlay # keep overlays over popups
 		iframe.isVisible = false
+		# save requesting iframe as parent
+		iframe._parent = ev.source
 
 		document.querySelectorAll('body')[0].appendChild iframe
 		iframe.setAttribute 'src', config.popup + '&name=' + encodeURIComponent(name) + '&event=ready'
@@ -281,6 +283,34 @@ class Popup
 
 		return
 
+	# Hides all visible popups
+	# Usable in the parent frame
+	@hideAll: ->
+		iframes = for id, iframe of Popup.iframes
+			iframe
+		
+		# close visible iframes
+		iframes.filter((iframe) -> iframe.isVisible)
+			.map (iframe) ->
+				Popup.doHide(iframe)
+				# send event to popup's parent frame for processing
+				send({t: 'p', d: {event: 'hide', name: iframe.name}}, iframe._parent)
+
+	# Message handler
+	# Will run in the child frame
+	# Triggered by Popup.hideAll
+	# @example message format: 
+	#	{
+	#		t: "p", #popup channel
+	#		d: {
+	#			event: "hide" # event name
+	#			name: "1770735e-10bf-7c8d-57e8-a6e9ab93cbd3" # the name of the popup
+	#		}
+	#	}
+	@onHide: (message, event) ->
+		popup = @popups[message.d.name]
+		popup._hide()
+
 	# Instance
 
 	type: 'popup'
@@ -356,7 +386,8 @@ class Popup
 		@_sendEvent('manage', { do: 'resize', @dimensions })
 
 	# Requests for the popup to be hid
-	hide: -> @_sendEvent('manage', { do: 'hide' }).then => @visible = false
+	hide: -> @_sendEvent('manage', { do: 'hide' }).then @_hide
+	_hide: => @visible = false
 
 	# Requests for the popup to be shown
 	show: -> @position().then => @_sendEvent('manage', { do: 'show' }).then => @visible = true
@@ -435,5 +466,8 @@ class Popup
 
 	_cacheStyle: (el, value) -> 
 		@styles[value] = getCssValue(el, value)
+
+# listen for clicks to hide popups
+event.on window.document, 'click', Popup.hideAll
 
 module.exports = Popup
