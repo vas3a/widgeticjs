@@ -2,7 +2,9 @@
   "name": "blogviojs",
   "version": "0.4.2",
   "authors": [
-    "Blogvio <support@blogvio.com>",
+    "Widgetic <support@widgetic.com>",
+    "Cristian Necula <cristian.necula@vuzum.com>",
+    "Vasilica Olariu <vasilica.olariu@vuzum.com>",
     "Iulian Meghea <iulian.meghea@gmail.com>"
   ],
   "main": "lib/sdk.js",
