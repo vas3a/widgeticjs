@@ -1,3 +1,4 @@
+config= require '../config'
 parse = require './parse'
 json  = require 'json3'
 win   = window
@@ -23,7 +24,8 @@ detect = (url)->
 
 	data = if hash then hashKey else queryKey
 
-	(win.opener or win.parent).postMessage json.stringify({ d: data, t: type }),'*'
+	sourceOrigin = if !isOauth then config.lo else win.location.origin
+	(win.opener or win.parent).postMessage json.stringify({ d: data, t: type }), sourceOrigin
 	
 detect.parse = parse
 module.exports = detect
