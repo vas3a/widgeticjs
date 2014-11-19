@@ -22,7 +22,7 @@ config ={
 	widget:"//#{domain}/api/v2/widgets/{id}/embed.html#{o}",
 	editor:"//#{domain}/api/v2/editor.html#{o}",
 	api:"/api/v2/",
-	domain: d = "#{wl.protocol}//#{domain}",
-	lo: decodeURIComponent parse(wl).queryKey.lo or d#listen to origin
+	domain: "#{wl.protocol}//#{domain}",
+	lo: decodeURIComponent parse(wl).queryKey.lo or wl.origin#listen to origin
 }
 module.exports = config

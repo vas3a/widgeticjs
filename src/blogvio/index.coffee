@@ -29,7 +29,7 @@ receivers = {
 }
 
 receiver = (e) ->
-	return unless e.origin is config.lo
+	return unless e.origin in [config.lo, config.domain]
 	d = e.data
 	try
 		return unless typeof d is "string"
