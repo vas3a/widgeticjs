@@ -57,7 +57,7 @@ Composition = (holder, data, brand_pos) ->
 	query.push 'client_id='+client_id if client_id
 	query.push 'wait' if data.wait_editor_init
 
-	url += '?'+query.join '&' if query.length
+	url = url.replace /(\?|$)/, "$1#{query.join '&' if query.length}&" if query.length
 
 	# generate a unique id and save a reference to this composition
 	@id = guid()

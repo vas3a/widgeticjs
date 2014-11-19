@@ -14,7 +14,7 @@ iframe  = (url,deffered)->
 	
 	clear = ->
 		parent.removeChild iframe
-		clearTimout timeout
+		clearTimeout timeout
 
 	timeout = setTimeout  fail, 10000
 	promise.then clear,clear

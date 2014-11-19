@@ -1,3 +1,4 @@
+config 	    = require './config'
 Root 		= require './dom/root'
 
 api 		= require './api'
@@ -28,13 +29,12 @@ receivers = {
 }
 
 receiver = (e) ->
-	# TODO: test MessageEvent.origin
+	return unless e.origin in [config.lo, config.domain]
 	d = e.data
 	try
 		return unless typeof d is "string"
 		d = JSON.parse(d)
 	catch error
-		return if d.indexOf('_FB_') == 0 # Facebook SDK
 		console.warn 'Blogvio SDK: error parsing JSON:', d
 		return
 
