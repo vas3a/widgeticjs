@@ -33,7 +33,7 @@ Root.prototype.createProxy = ->
 		timeout = setTimeout  fail,10000
 
 		Root._done = ->
-			api.setProxy (message)->proxy.contentWindow.postMessage message,'*'
+			api.setProxy (message)->proxy.contentWindow.postMessage message, config.domain
 			
 			console.log "SDK initialized"
 			clearTimeout timeout
