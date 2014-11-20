@@ -39,8 +39,13 @@ auth.setAuthOptions = (id,uri,root)->
 
 auth.getClientId = -> app.id
 
+auth.retry = (response) ->
+	auth.apply @, response.d
+
 auth.connect = (response)->
 	data = response.d
+	# try reauthenticating before the token expires
+	setTimeout auth.bind(@, false), data.expires_in*1000-1500
 	if data and data.access_token
 		api.setTokens data
 		link.deffered.resolve api.getStatus()
