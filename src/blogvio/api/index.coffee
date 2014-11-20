@@ -11,6 +11,7 @@ pubsub  = require 'pubsub.js'
 defs 	= {}
 link    = {}
 tokenDef= null
+tknDelay=null
 init    = false
 
 prepare_message = (url,method,data,id) ->
@@ -67,7 +68,7 @@ requestToken = ->
 	promise = (tokenDef = aye.defer()).promise
 	message = json.stringify {t: 'r', d: [false]}
 	window.parent.postMessage message, config.lo
-	setTimeout tokenDef.reject, 3000
+	tknDelay = setTimeout tokenDef.reject, 3000
 	promise
 
 api.setProxy = (proxy) -> link.proxy = proxy
@@ -90,7 +91,9 @@ api.getStatus = ->
 
 api.accessToken = (token) -> 
 	if token
+		clearTimeout tknDelay
 		tokenDef?.resolve token
+
 		api.setTokens {
 			access_token: token
 			expires_in: undefined
