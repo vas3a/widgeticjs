@@ -26,6 +26,7 @@ receivers = {
 	'w' : Editor.connect # editor ready
 	'ee': Editor.event # editor event
 	'p' : UI.popup.receiver
+	'r' : auth.retry
 }
 
 receiver = (e) ->

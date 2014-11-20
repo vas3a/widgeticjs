@@ -9,7 +9,9 @@ pubsub  = require 'pubsub.js'
 
 
 defs 	= {}
-link = {}
+link    = {}
+tokenDef= null
+init    = false
 
 prepare_message = (url,method,data,id) ->
 	url = config.api + url
@@ -54,14 +56,24 @@ api.response = (message) ->
 	else
 		if data.error and data.error in ['invalid_grant', 'access_denied']
 			# if there was an auth error, try authorizing again
-			ok = ->link.proxy( prepare_message.apply @, deffered.margs )
-			(require '../auth/index')(false).then ok,(->deffered.reject 'Unable to login again!')
+			ok = -> tokenDef = null; link.proxy prepare_message.apply @, deffered.margs
+			requestToken().then ok, (-> tokenDef = null; deffered.reject 'Unable to login again!')
 		else
 			deffered.reject data
+
+requestToken = ->
+	return (require '../auth/index')(false) unless init
+
+	promise = (tokenDef = aye.defer()).promise
+	message = json.stringify {t: 'r', d: [false]}
+	window.parent.postMessage message, config.lo
+	setTimeout tokenDef.reject, 3000
+	promise
 
 api.setProxy = (proxy) -> link.proxy = proxy
 
 api.setTokens = (tokens) ->
+	init = true
 	link.tokens = tokens
 	pubsub.publish 'api/token/update'
 
@@ -78,6 +90,7 @@ api.getStatus = ->
 
 api.accessToken = (token) -> 
 	if token
+		tokenDef?.resolve token
 		api.setTokens {
 			access_token: token
 			expires_in: undefined
