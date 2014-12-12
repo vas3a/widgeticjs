@@ -53,7 +53,7 @@ Composition = (holder, data, brand_pos) ->
 	if data.widget_id? and not client_id
 		throw new Error 'Blogvio should be initialized before using the UI.Composition!'
 
-	query.push 'access_token='+token if token = api.accessToken()
+	query.push 'access_token='+token if token = data.token or api.accessToken()
 	query.push 'client_id='+client_id if client_id
 	query.push 'wait' if data.wait_editor_init
 
