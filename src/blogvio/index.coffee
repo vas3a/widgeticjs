@@ -23,6 +23,7 @@ receivers = {
 	'i'	: Root.connect # init
 	'o'	: auth.connect # oauth
 	'u' : Composition.connect # composition ready
+	'ce': Composition.event # composition event
 	'w' : Editor.connect # editor ready
 	'ee': Editor.event # editor event
 	'p' : UI.popup.receiver
