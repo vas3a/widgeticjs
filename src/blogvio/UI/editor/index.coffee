@@ -32,7 +32,10 @@ Editor = (holder, @composition, opts) ->
 	# create the editor iframe
 	url = config.editor + '#' + @composition.id
 	if opts?.asPopup
-		@frame = window.open url, guid(), "height=#{opts.h or 565},width=#{opts.w or 490}"
+		if @frame = holder
+			@frame.location.href = url
+		else
+			@frame = window.open url, guid(), "height=#{opts.h or 565},width=#{opts.w or 490}"
 	else
 		@_iframe = document.createElement 'iframe'
 		@_iframe.setAttribute 'class', 'blogvio-editor'
