@@ -42,6 +42,10 @@ stylesFactory = {
 			holdStyle: "height: #{ height }px; padding-top: 0;"
 		}
 	'fill': (width, height) -> 
+		{
+			holdStyle: "width: 100%; height: 100%;"
+		}
+	'fill-width': (width, height) -> 
 		ratio = height * 100 / width;
 		{
 			holdStyle: "padding-top: #{ ratio }%;"
