@@ -30,8 +30,9 @@ receivers = {
 	'r' : auth.retry
 }
 
+originRegex = ///#{config.lo.replace /(http|https)\:/, ''}|#{config.domain.replace /(http|https)\:/, ''}///
 receiver = (e) ->
-	return unless e.origin in [config.lo, config.domain]
+	return unless originRegex.test e.origin
 	d = e.data
 	try
 		return unless typeof d is "string"
