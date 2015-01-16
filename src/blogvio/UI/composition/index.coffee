@@ -41,6 +41,8 @@ Composition = (holder, data, brand_pos) ->
 		url = config.composition.replace('{id}', data)
 	else if typeof data is 'object'
 		url = config.widget.replace('{id}', data.widget_id)
+		# load local/temp composition
+		url+= "#comp=#{data.id}" if data.id?
 		@setSkin data.skin if data.skin
 		@setContent data.content if data.content
 
@@ -165,6 +167,7 @@ methods = {
 	'setSkin':       'ss'
 	'changeSkin':    'cs'
 	'save':          's'
+	'saveDraft':     'sd'
 	'setName':       'sn'
 }
 
