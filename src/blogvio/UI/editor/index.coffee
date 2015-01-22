@@ -30,18 +30,29 @@ Editor = (holder, @composition, opts) ->
 	editors[@composition.id] = @
 
 	# create the editor iframe
-	@_iframe = document.createElement 'iframe'
-	@_iframe.setAttribute 'class', 'blogvio-editor'
-	@_iframe.setAttribute 'name', guid()
-	holder.appendChild @_iframe
-	@_iframe.setAttribute 'src', config.editor + '#' + @composition.id
+	url = config.editor + '#' + @composition.id
+	if opts?.asPopup
+		if @frame = holder
+			@frame.location.href = url
+		else
+			@frame = window.open url, guid(), "height=#{opts.h or 565},width=#{opts.w or 490}"
+	else
+		@_iframe = document.createElement 'iframe'
+		@_iframe.setAttribute 'class', 'blogvio-editor'
+		@_iframe.setAttribute 'name', guid()
+		holder.appendChild @_iframe
+		@_iframe.setAttribute 'src', url
+		@frame = @_iframe.contentWindow
 
 	@
 
 # Close the editor
 Editor.prototype.close = ->
 	editors[@composition.id] = null
-	@_iframe.parentNode.removeChild(@_iframe)
+	if @_iframe
+		@_iframe.parentNode.removeChild @_iframe
+	else
+		@frame.close()
 	@
 
 # Go to an editor step
@@ -116,7 +127,7 @@ Editor.prototype._trigger = (args...) ->
 # @private
 Editor.prototype._sendMessage = (message) ->
 	@_queue.defer (next) =>
-		@_iframe.contentWindow.postMessage JSON.stringify(message), '*'
+		@frame.postMessage JSON.stringify(message), '*'
 		next()
 
 # Called when the editor iframe is ready, starts processing the queue
