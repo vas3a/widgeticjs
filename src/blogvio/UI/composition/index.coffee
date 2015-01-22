@@ -166,6 +166,7 @@ methods = {
 	'removeContent': 'rc'
 	'setSkin':       'ss'
 	'changeSkin':    'cs'
+	'removeSkin':    'rs'
 	'save':          's'
 	'saveDraft':     'sd'
 	'setName':       'sn'
