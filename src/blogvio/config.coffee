@@ -1,3 +1,7 @@
+wl = window.location
+unless wl.origin
+	wl.origin = wl.protocol + "//" + wl.hostname + (if wl.port then ':' + wl.port else '')
+
 parse = require './detect/parse'
 
 deriveScriptElement = ->
@@ -12,7 +16,6 @@ deriveScriptElement = ->
 script 	= deriveScriptElement()
 url 	= parse script.src
 domain 	= url.hashKey['domain'] || 'widgetic.com'
-wl      = window.location
 o = "?lo=#{encodeURIComponent wl.origin}"
 config ={
 	proxy:"https://#{domain}/sdk/proxy.html#{o}#proxy",
