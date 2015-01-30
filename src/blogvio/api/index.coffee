@@ -12,7 +12,6 @@ defs 	= {}
 link    = {}
 tokenDef= null
 tknDelay=null
-init    = false
 
 prepare_message = (url,method,data,id) ->
 	url = config.api + url
@@ -63,7 +62,7 @@ api.response = (message) ->
 			deffered.reject data
 
 requestToken = ->
-	return (require '../auth/index')(false) unless init
+	return auth false if (auth = require '../auth/index').getClientId()?
 
 	promise = (tokenDef = aye.defer()).promise
 	message = json.stringify {t: 'r', d: [false]}
@@ -74,7 +73,6 @@ requestToken = ->
 api.setProxy = (proxy) -> link.proxy = proxy
 
 api.setTokens = (tokens) ->
-	init = true
 	link.tokens = tokens
 	pubsub.publish 'api/token/update'
 

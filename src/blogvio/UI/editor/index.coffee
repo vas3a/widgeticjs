@@ -30,18 +30,29 @@ Editor = (holder, @composition, opts) ->
 	editors[@composition.id] = @
 
 	# create the editor iframe
-	@_iframe = document.createElement 'iframe'
-	@_iframe.setAttribute 'class', 'blogvio-editor'
-	@_iframe.setAttribute 'name', guid()
-	holder.appendChild @_iframe
-	@_iframe.setAttribute 'src', config.editor + '#' + @composition.id
+	url = config.editor + '#' + @composition.id
+	if opts?.asPopup
+		if @frame = holder
+			@frame.location.href = url
+		else
+			@frame = window.open url, guid(), "height=#{opts.h or 565},width=#{opts.w or 490}"
+	else
+		@_iframe = document.createElement 'iframe'
+		@_iframe.setAttribute 'class', 'blogvio-editor'
+		@_iframe.setAttribute 'name', guid()
+		holder.appendChild @_iframe
+		@_iframe.setAttribute 'src', url
+		@frame = @_iframe.contentWindow
 
 	@
 
 # Close the editor
 Editor.prototype.close = ->
 	editors[@composition.id] = null
-	@_iframe.parentNode.removeChild(@_iframe)
+	if @_iframe
+		@_iframe.parentNode.removeChild @_iframe
+	else
+		@frame.close()
 	@
 
 # Go to an editor step
@@ -56,8 +67,8 @@ Editor.prototype.goTo = (step) ->
 #	navigation: { enabled: [true, false] #default: true }, 
 #	skin: [object Skin]
 # }
-Editor.prototype.setEditorOptions = (options) ->
-	@_sendMessage {t: 'opts', d: options}
+Editor.prototype.setEditorOptions = (@options = @options) ->
+	@_sendMessage {t: 'opts', d: @options}
 	@
 
 # Initialize a composition save
@@ -116,13 +127,14 @@ Editor.prototype._trigger = (args...) ->
 # @private
 Editor.prototype._sendMessage = (message) ->
 	@_queue.defer (next) =>
-		@_iframe.contentWindow.postMessage JSON.stringify(message), '*'
+		@frame.postMessage JSON.stringify(message), '*'
 		next()
 
 # Called when the editor iframe is ready, starts processing the queue
 # 
 # @private
 Editor.prototype._ready = -> 
+	@ready = true
 	Blogvio.debug.timestamp 'Blogvio.UI.Editor:_ready'
 	@_startQueue()
 
@@ -131,6 +143,7 @@ Editor.prototype._ready = ->
 # 
 # @private
 Editor.prototype._compReady = -> 
+	@compReady = true
 	Blogvio.debug.timestamp 'Blogvio.UI.Editor:_compReady'
 	@_sendMessage {t: 'ready'}
 
@@ -142,9 +155,17 @@ Editor.prototype._updateToken = ->
 	Blogvio.debug.timestamp 'Blogvio.UI.Editor:_updateToken'
 	@_sendMessage {t: 'token', d: api.accessToken()}
 
+Editor.prototype._onConnect = -> 
+	if @ready and @compReady then @_queue.defer (next) =>
+		@setEditorOptions()
+		@_compReady()
+		next()
+
+	@_ready()
+
 # Given an editor id, calls the _ready method
 # Added as a postMessage receiver in blogvio/index
-Editor.connect = (data) -> editors[data.id]._ready()
+Editor.connect = (data) -> editors[data.id]._onConnect()
 
 # Calls _trigger on an editor with the event received from the editor iframe
 Editor.event = (data) -> editors[data.id]._trigger(data.e, data.d)

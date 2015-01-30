@@ -41,6 +41,8 @@ Composition = (holder, data, brand_pos) ->
 		url = config.composition.replace('{id}', data)
 	else if typeof data is 'object'
 		url = config.widget.replace('{id}', data.widget_id)
+		# load local/temp composition
+		url+= "#comp=#{data.id}" if data.id?
 		@setSkin data.skin if data.skin
 		@setContent data.content if data.content
 
@@ -53,7 +55,7 @@ Composition = (holder, data, brand_pos) ->
 	if data.widget_id? and not client_id
 		throw new Error 'Blogvio should be initialized before using the UI.Composition!'
 
-	query.push 'access_token='+token if token = api.accessToken()
+	query.push 'access_token='+token if token = data.token or api.accessToken()
 	query.push 'client_id='+client_id if client_id
 	query.push 'wait' if data.wait_editor_init
 
@@ -110,6 +112,49 @@ Composition.prototype._sendMessage = (message) ->
 		next()
 	@
 
+# Bind an event listener
+# Supported events are:
+#  - composition:save
+Composition.prototype.on = (ev, callback) ->
+	evs   = ev.split(' ')
+	calls = @hasOwnProperty('_callbacks') and @_callbacks or= {}
+	for name in evs
+		calls[name] or= []
+		calls[name].push(callback)
+	@
+
+# Unbind an event listener
+Composition.prototype.off = (ev, callback) ->	
+	if arguments.length is 0
+		@_callbacks = {}
+		return @
+	return @ unless ev
+	evs = ev.split(' ')
+	for name in evs
+		list = @_callbacks?[name]
+		continue unless list
+		unless callback
+			delete @_callbacks[name]
+			continue
+		for cb, i in list when (cb is callback)
+			list = list.slice()
+			list.splice(i, 1)
+			@_callbacks[name] = list
+			break
+	@
+
+# Trigger an event
+# 
+# @private
+Composition.prototype._trigger = (args...) ->
+	ev = args.shift()
+	list = @hasOwnProperty('_callbacks') and @_callbacks?[ev]
+	return unless list
+	for callback in list
+		if callback.apply(@, args) is false
+			break
+	true
+
 # Add these methods to the Composition prototype to define the public API.
 # Each method id a call to _sendMessage with the respective messageType.
 # The iframe should listen to these messages and modify the widget.
@@ -121,6 +166,10 @@ methods = {
 	'removeContent': 'rc'
 	'setSkin':       'ss'
 	'changeSkin':    'cs'
+	'removeSkin':    'rs'
+	'save':          's'
+	'saveDraft':     'sd'
+	'setName':       'sn'
 }
 
 for method, messageType of methods
@@ -132,5 +181,9 @@ for method, messageType of methods
 # type, which is sent by the Composition's iframe when finished loading.
 Composition.connect = (id) ->
 	comps[id.d]._ready()
+
+# Calls _trigger on an editor with the event received from the editor iframe
+Composition.event = (data) -> 
+	comps[data.id]._trigger(data.e, data.d)
 
 module.exports = Composition
