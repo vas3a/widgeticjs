@@ -71,10 +71,11 @@ Blogvio.prototype.init = (client_id, redirect_uri) ->
 	auth.setAuthOptions client_id,redirect_uri
 	@
 
-Blogvio.prototype.api 		  = -> initProxy(); return api.apply @, arguments
-Blogvio.prototype.auth  	  = -> auth.apply @, arguments
-Blogvio.prototype.auth.status = -> api.getStatus.apply @, arguments
-Blogvio.prototype.auth.token  = -> api.accessToken.apply @, arguments
+Blogvio.prototype.api           = -> initProxy(); return api.apply @, arguments
+Blogvio.prototype.auth          = -> auth.apply @, arguments
+Blogvio.prototype.auth.register = -> auth.register.apply @, arguments
+Blogvio.prototype.auth.status   = -> api.getStatus.apply @, arguments
+Blogvio.prototype.auth.token    = -> api.accessToken.apply @, arguments
 Blogvio.prototype.auth.disconnect  = -> api.disconnect.apply @, arguments
 
 #accessible from outside
