@@ -4,18 +4,7 @@ unless wl.origin
 
 parse = require './detect/parse'
 
-deriveScriptElement = ->
-	id = "blogvio_test_src"
-	document.write "<script id='#{id}'></script>"
-	dummyScript = document.getElementById id
-	element 	= dummyScript.previousSibling
-	element=element.previousSibling if element.nodeName =='STYLE'
-	dummyScript.parentNode.removeChild dummyScript
-	element
-
-script 	= deriveScriptElement()
-url 	= parse script.src
-domain 	= url.hashKey['domain'] || 'widgetic.com'
+domain = window.widgeticOptions?.domain || 'widgetic.com'
 o = "?lo=#{encodeURIComponent wl.origin}"
 config ={
 	proxy:"https://#{domain}/sdk/proxy.html#{o}#proxy",
