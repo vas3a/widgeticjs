@@ -74,6 +74,12 @@ Composition = (holder, data, brand_pos) ->
 
 	@
 
+Composition.prototype.close = ->
+	comps[@id] = null
+	@_iframe.parentNode.removeChild @_iframe
+	@off()
+	@
+
 Composition.prototype.queue = (callback) ->
 	@_queue.defer (next) =>
 		callback()
