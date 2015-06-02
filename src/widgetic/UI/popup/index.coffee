@@ -420,7 +420,7 @@ class Popup
 		data = { @name, event }
 		data = extend(data, extra)
 		{ promise, message } = newMessage(data)
-		send(message)
+		send(message, @targetWindow)
 		return promise
 
 	# Caches relevant nodes from the iframe and styles the contents

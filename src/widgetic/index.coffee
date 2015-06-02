@@ -73,6 +73,7 @@ Widgetic.prototype.init = (client_id, redirect_uri) ->
 
 Widgetic.prototype.api 		  = -> initProxy(); return api.apply @, arguments
 Widgetic.prototype.auth  	  = -> auth.apply @, arguments
+Widgetic.prototype.auth.register = -> auth.register.apply @, arguments
 Widgetic.prototype.auth.status = -> api.getStatus.apply @, arguments
 Widgetic.prototype.auth.token  = -> api.accessToken.apply @, arguments
 Widgetic.prototype.auth.disconnect  = -> api.disconnect.apply @, arguments
