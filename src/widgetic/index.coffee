@@ -38,16 +38,16 @@ receiver = (e) ->
 		return unless typeof d is "string"
 		d = JSON.parse(d)
 	catch error
-		console.warn 'Blogvio SDK: error parsing JSON:', d
+		console.warn 'Widgetic SDK: error parsing JSON:', d
 		return
 
 	try 
 		receivers[d.t]?(d, e)
 	catch error
-		console.error 'Blogvio SDK: ', error.stack
+		console.error 'Widgetic SDK: ', error.stack
 
-Blogvio = ->
-	win['BlogvioAsyncInit']?()
+Widgetic = ->
+	win['WidgeticAsyncInit']?()
 	event.on win,'message',receiver
 	detect win.location.href
 	Root.style()
@@ -65,30 +65,30 @@ initProxy = ->
 		whenReady create
 
 
-Blogvio.prototype.init = (client_id, redirect_uri) ->
+Widgetic.prototype.init = (client_id, redirect_uri) ->
 	initProxy()
 	return @ unless (client_id and redirect_uri)
 	auth.setAuthOptions client_id,redirect_uri
 	@
 
-Blogvio.prototype.api 		  = -> initProxy(); return api.apply @, arguments
-Blogvio.prototype.auth  	  = -> auth.apply @, arguments
-Blogvio.prototype.auth.status = -> api.getStatus.apply @, arguments
-Blogvio.prototype.auth.token  = -> api.accessToken.apply @, arguments
-Blogvio.prototype.auth.disconnect  = -> api.disconnect.apply @, arguments
+Widgetic.prototype.api 		  = -> initProxy(); return api.apply @, arguments
+Widgetic.prototype.auth  	  = -> auth.apply @, arguments
+Widgetic.prototype.auth.status = -> api.getStatus.apply @, arguments
+Widgetic.prototype.auth.token  = -> api.accessToken.apply @, arguments
+Widgetic.prototype.auth.disconnect  = -> api.disconnect.apply @, arguments
 
 #accessible from outside
-Blogvio.prototype.JSON  	= JSON
-Blogvio.prototype.Queue 	= api.queue
-Blogvio.prototype.Aye		= require 'aye'
-Blogvio.prototype.Event 	= event
-Blogvio.prototype.GUID 		= require './utils/guid'
-Blogvio.prototype.pubsub    = require 'pubsub.js'
-Blogvio.prototype.require 	= require
-Blogvio.prototype.UI        = UI
-Blogvio.prototype.VERSION   = '@VERSION'
-Blogvio.prototype.debug     = {
+Widgetic.prototype.JSON  	= JSON
+Widgetic.prototype.Queue 	= api.queue
+Widgetic.prototype.Aye		= require 'aye'
+Widgetic.prototype.Event 	= event
+Widgetic.prototype.GUID 		= require './utils/guid'
+Widgetic.prototype.pubsub    = require 'pubsub.js'
+Widgetic.prototype.require 	= require
+Widgetic.prototype.UI        = UI
+Widgetic.prototype.VERSION   = '@VERSION'
+Widgetic.prototype.debug     = {
 	timestamp: require './utils/timestamp'
 }
 
-module.exports = Blogvio
+module.exports = Widgetic

@@ -19,7 +19,7 @@ auth = (interactive=true, scope) ->
 	deffered = aye.defer()
 
 	unless app.id and app.uri
-		deffered.reject 'Blogvio must be initialized with client id and redirect uri!'
+		deffered.reject 'Widgetic must be initialized with client id and redirect uri!'
 		return deffered.promise
 	
 	oa = if interactive  then popup else iframe

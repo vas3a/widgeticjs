@@ -75,7 +75,7 @@ embed = (el) ->
 	el.insertAdjacentHTML('afterbegin', resizeHolderTemplate(options.id, styles))
 	el = replaceParentWithChild(el)
 	holder = getHolder(el)
-	composition = new Blogvio.UI.composition(holder, options.id, options.brand_pos)
+	composition = new Widgetic.UI.composition(holder, options.id, options.brand_pos)
 	composition._iframe.setAttribute 'style', 'position:absolute;top:0;left:0;width:100%;height:100%;'
 	# prevent flash of white while the iframe loads
 	composition._iframe.style.visibility = 'hidden'
