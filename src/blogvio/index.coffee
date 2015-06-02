@@ -90,6 +90,7 @@ Blogvio.prototype.Event 	= event
 Blogvio.prototype.GUID 		= require './utils/guid'
 Blogvio.prototype.pubsub    = require 'pubsub.js'
 Blogvio.prototype.require 	= require
+Blogvio.prototype.EVENTS    = require './constants/events'
 Blogvio.prototype.UI        = UI
 Blogvio.prototype.VERSION   = '@VERSION'
 Blogvio.prototype.debug     = {
