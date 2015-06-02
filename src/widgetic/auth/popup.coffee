@@ -13,7 +13,7 @@ popup  = (url,deffered)->
 	promise = deffered.promise
 
 	link.win?.close()
-	link.win = win = rwin.open url,"blogvio_popup_#{guid()}", options(500,496)
+	link.win = win = rwin.open url,"widgetic_popup_#{guid()}", options(500,496)
 
 	check = ->
 		if !win or win.closed

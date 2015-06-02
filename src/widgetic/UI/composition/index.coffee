@@ -29,7 +29,7 @@ comps  = {}
 # 		]
 # 	}
 Composition = (holder, data, brand_pos) ->
-	Blogvio.debug.timestamp 'Blogvio.UI.Composition:constructor'
+	Widgetic.debug.timestamp 'Widgetic.UI.Composition:constructor'
 	# create the queue of messages
 	@_queue = queue(1)
 	# get the queue continuation function,
@@ -53,7 +53,7 @@ Composition = (holder, data, brand_pos) ->
 
 	client_id = auth.getClientId()
 	if data.widget_id? and not client_id
-		throw new Error 'Blogvio should be initialized before using the UI.Composition!'
+		throw new Error 'Widgetic should be initialized before using the UI.Composition!'
 
 	query.push 'access_token='+token if token = data.token or api.accessToken()
 	query.push 'client_id='+client_id if client_id
@@ -67,7 +67,7 @@ Composition = (holder, data, brand_pos) ->
 
 	# create the iframe
 	@_iframe = document.createElement 'iframe'
-	@_iframe.setAttribute 'class', 'blogvio-composition'
+	@_iframe.setAttribute 'class', 'widgetic-composition'
 	@_iframe.setAttribute 'name', @id
 	holder.appendChild @_iframe
 	@_iframe.setAttribute 'src', url
@@ -89,7 +89,7 @@ Composition.prototype.queue = (callback) ->
 # 
 # @private
 Composition.prototype._ready = ->
-	Blogvio.debug.timestamp 'Blogvio.UI.Composition:_ready'
+	Widgetic.debug.timestamp 'Widgetic.UI.Composition:_ready'
 	@_startQueue()
 
 # Adds a postMessage to the queue
@@ -184,7 +184,7 @@ for method, messageType of methods
 		Composition.prototype[method] = (data) -> @_sendMessage(t: messageType, d: data)
 
 # Given an id, calls the _ready method on a composition.
-# This method is defined in blogvio\index as a receiver for the 'u' event
+# This method is defined in widgetic\index as a receiver for the 'u' event
 # type, which is sent by the Composition's iframe when finished loading.
 Composition.connect = (id) ->
 	comps[id.d]._ready()
