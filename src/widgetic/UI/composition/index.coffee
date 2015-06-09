@@ -28,7 +28,11 @@ comps  = {}
 # 			}
 # 		]
 # 	}
-Composition = (holder, data, brand_pos) ->
+Composition = (holder, opt1, opt2 = {}) ->
+	composition = opt1 if typeof opt1 is 'string'
+	options = if composition then opt2 else opt1
+	composition ?= options.composition
+
 	Widgetic.debug.timestamp 'Widgetic.UI.Composition:constructor'
 	# create the queue of messages
 	@_queue = queue(1)
@@ -37,27 +41,26 @@ Composition = (holder, data, brand_pos) ->
 	@_queue.defer (next) => @_startQueue = next
 
 	# get the url
-	if typeof data is 'string'
-		url = config.composition.replace('{id}', data)
-	else if typeof data is 'object'
-		url = config.widget.replace('{id}', data.widget_id)
+	if composition
+		url = config.composition.replace '{id}', composition
+	else
+		url = config.widget.replace('{id}', options.widget_id)
 		# load local/temp composition
-		url+= "#comp=#{data.id}" if data.id?
-		@setSkin data.skin if data.skin
-		@setContent data.content if data.content
+		url+= "#comp=#{options.id}" if options.id?
+		@setSkin options.skin if options.skin
+		@setContent options.content if options.content
 
 	query = []
 
-	brand_pos or= data.brand_pos
-	query.push 'bp='+brand_pos if brand_pos
-
 	client_id = auth.getClientId()
-	if data.widget_id? and not client_id
+	if options.widget_id? and not client_id
 		throw new Error 'Widgetic should be initialized before using the UI.Composition!'
 
-	query.push 'access_token='+token if token = data.token or api.accessToken()
+	query.push 'access_token='+token if token = options.token or api.accessToken()
 	query.push 'client_id='+client_id if client_id
-	query.push 'wait' if data.wait_editor_init
+	query.push 'wait' if options.wait_editor_init
+	query.push 'branding' if options.branding
+	query.push 'bp='+options.brand_pos if options.brand_pos
 
 	url = url.replace /(\?)|((.)(\#)|($))/, "?#{query.join '&' if query.length}&$2" if query.length
 
