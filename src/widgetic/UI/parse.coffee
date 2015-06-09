@@ -61,21 +61,22 @@ parse = -> whenReady ->
 		
 embed = (el) ->
 	options = {
-		id:     el.getAttribute('data-id')
+		composition: el.getAttribute('data-id')
 		width:  el.getAttribute('data-width') || 300
 		height: el.getAttribute('data-height') || 300
 		resize: el.getAttribute('data-resize') || defaultResizeStyle
 		brand_pos: el.getAttribute('data-brand') || 'bottom-right'
+		branding: el.hasAttribute('data-branding')
 	}
 
-	return unless options.id
+	return unless options.composition
 	options.resize = defaultResizeStyle unless stylesFactory[options.resize]
 
 	styles = stylesFactory[options.resize](options.width, options.height)
 	el.insertAdjacentHTML('afterbegin', resizeHolderTemplate(options.id, styles))
 	el = replaceParentWithChild(el)
 	holder = getHolder(el)
-	composition = new Widgetic.UI.composition(holder, options.id, options.brand_pos)
+	composition = new Widgetic.UI.composition(holder, options.composition, options)
 	composition._iframe.setAttribute 'style', 'position:absolute;top:0;left:0;width:100%;height:100%;'
 	# prevent flash of white while the iframe loads
 	composition._iframe.style.visibility = 'hidden'
