@@ -16,7 +16,7 @@ module.exports 	= (grunt)->
 					'lib/sdk.js': 'lib/sdk.dev.js'
 				options: 
 					console: false
-					namespace: ['Blogvio.debug']
+					namespace: ['Widgetic.debug']
 		bump: 
 			options: 
 				files: ['package.json', 'bower.json'],
@@ -46,7 +46,7 @@ module.exports 	= (grunt)->
 					external: ['spine/utils/timestamp']
 					aliasMappings:[
 						{
-							cwd:'src/blogvio',
+							cwd:'src/widgetic',
 							src: ['**/*.coffee'],
 							dest: '.'
 						}
@@ -89,7 +89,7 @@ module.exports 	= (grunt)->
 				hostname:"*"
 			proxies:[{
 				context 		: '/api/v2'
-				host			: 'staging.blogvio.com'
+				host			: 'staging.widgetic.com'
 				changeOrigin	: true
 			}]
 			server:

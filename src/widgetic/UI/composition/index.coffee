@@ -28,8 +28,12 @@ comps  = {}
 # 			}
 # 		]
 # 	}
-Composition = (holder, data, brand_pos) ->
-	Blogvio.debug.timestamp 'Blogvio.UI.Composition:constructor'
+Composition = (holder, opt1, opt2 = {}) ->
+	composition = opt1 if typeof opt1 is 'string'
+	options = if composition then opt2 else opt1
+	composition ?= options.composition
+
+	Widgetic.debug.timestamp 'Widgetic.UI.Composition:constructor'
 	# create the queue of messages
 	@_queue = queue(1)
 	# get the queue continuation function,
@@ -37,27 +41,26 @@ Composition = (holder, data, brand_pos) ->
 	@_queue.defer (next) => @_startQueue = next
 
 	# get the url
-	if typeof data is 'string'
-		url = config.composition.replace('{id}', data)
-	else if typeof data is 'object'
-		url = config.widget.replace('{id}', data.widget_id)
+	if composition
+		url = config.composition.replace '{id}', composition
+	else
+		url = config.widget.replace('{id}', options.widget_id)
 		# load local/temp composition
-		url+= "#comp=#{data.id}" if data.id?
-		@setSkin data.skin if data.skin
-		@setContent data.content if data.content
+		url+= "#comp=#{options.id}" if options.id?
+		@setSkin options.skin if options.skin
+		@setContent options.content if options.content
 
 	query = []
 
-	brand_pos or= data.brand_pos
-	query.push 'bp='+brand_pos if brand_pos
-
 	client_id = auth.getClientId()
-	if data.widget_id? and not client_id
-		throw new Error 'Blogvio should be initialized before using the UI.Composition!'
+	if options.widget_id? and not client_id
+		throw new Error 'Widgetic should be initialized before using the UI.Composition!'
 
-	query.push 'access_token='+token if token = data.token or api.accessToken()
+	query.push 'access_token='+token if token = options.token or api.accessToken()
 	query.push 'client_id='+client_id if client_id
-	query.push 'wait' if data.wait_editor_init
+	query.push 'wait' if options.wait_editor_init
+	query.push 'branding' if options.branding
+	query.push 'bp='+options.brand_pos if options.brand_pos
 
 	url = url.replace /(\?)|((.)(\#)|($))/, "?#{query.join '&' if query.length}&$2" if query.length
 
@@ -67,7 +70,7 @@ Composition = (holder, data, brand_pos) ->
 
 	# create the iframe
 	@_iframe = document.createElement 'iframe'
-	@_iframe.setAttribute 'class', 'blogvio-composition'
+	@_iframe.setAttribute 'class', 'widgetic-composition'
 	@_iframe.setAttribute 'name', @id
 	holder.appendChild @_iframe
 	@_iframe.setAttribute 'src', url
@@ -83,7 +86,7 @@ Composition.prototype.queue = (callback) ->
 # 
 # @private
 Composition.prototype._ready = ->
-	Blogvio.debug.timestamp 'Blogvio.UI.Composition:_ready'
+	Widgetic.debug.timestamp 'Widgetic.UI.Composition:_ready'
 	@_startQueue()
 
 # Adds a postMessage to the queue
@@ -177,7 +180,7 @@ for method, messageType of methods
 		Composition.prototype[method] = (data) -> @_sendMessage(t: messageType, d: data)
 
 # Given an id, calls the _ready method on a composition.
-# This method is defined in blogvio\index as a receiver for the 'u' event
+# This method is defined in widgetic\index as a receiver for the 'u' event
 # type, which is sent by the Composition's iframe when finished loading.
 Composition.connect = (id) ->
 	comps[id.d]._ready()

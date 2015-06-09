@@ -1,3 +1,6 @@
-BSDK = require './blogvio'
-window.Blogvio or= new BSDK()
-module.exports = window.Blogvio
+SDK = require './widgetic'
+window.Widgetic or= new SDK()
+module.exports = window.Widgetic
+
+# @DEPRECATED
+window.Blogvio = window.Widgetic

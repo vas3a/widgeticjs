@@ -12,14 +12,14 @@ link 	= {}
 
 lastScope = []
 
-url = (scope=[])->
-	"#{config.auth}?client_id=#{app.id}&redirect_uri=#{app.uri}&response_type=token&scope=#{scope.join ' '}#oauth"
+url = (scope=[], hash='oauth')->
+	"#{config.auth}?client_id=#{app.id}&redirect_uri=#{app.uri}&response_type=token&scope=#{scope.join ' '}##{hash}"
 
-auth = (interactive=true, scope) ->
+_get = (interactive=true, scope) ->
 	deffered = aye.defer()
 
 	unless app.id and app.uri
-		deffered.reject 'Blogvio must be initialized with client id and redirect uri!'
+		deffered.reject 'Widgetic must be initialized with client id and redirect uri!'
 		return deffered.promise
 	
 	oa = if interactive  then popup else iframe
@@ -30,8 +30,17 @@ auth = (interactive=true, scope) ->
 	scope = lastScope
 	
 	link.deffered = deffered
+	{oa, scope, deffered}
+
+auth = ->
+	{oa, scope, deffered} = _get arguments...
 
 	oa(url(scope),deffered)
+
+auth.register = (scope) ->
+	{oa, scope, deffered} = _get true, scope
+
+	oa(url(scope, 'signup'),deffered)
 
 auth.setAuthOptions = (id,uri,root)->
 	app.id = id

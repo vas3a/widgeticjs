@@ -11,7 +11,7 @@ editors = {}
 # Creates an iframe with an editor for the composition
 # TODO: add selectSkin
 Editor = (holder, @composition, opts) ->
-	Blogvio.debug.timestamp 'Blogvio.UI.Editor:constructor'
+	Widgetic.debug.timestamp 'Widgetic.UI.Editor:constructor'
 	# create a queue of messages
 	@_queue = queue(1)
 	# get the queue continuation function
@@ -38,7 +38,7 @@ Editor = (holder, @composition, opts) ->
 			@frame = window.open url, guid(), "height=#{opts.h or 565},width=#{opts.w or 490}"
 	else
 		@_iframe = document.createElement 'iframe'
-		@_iframe.setAttribute 'class', 'blogvio-editor'
+		@_iframe.setAttribute 'class', 'widgetic-editor'
 		@_iframe.setAttribute 'name', guid()
 		holder.appendChild @_iframe
 		@_iframe.setAttribute 'src', url
@@ -135,7 +135,7 @@ Editor.prototype._sendMessage = (message) ->
 # @private
 Editor.prototype._ready = -> 
 	@ready = true
-	Blogvio.debug.timestamp 'Blogvio.UI.Editor:_ready'
+	Widgetic.debug.timestamp 'Widgetic.UI.Editor:_ready'
 	@_startQueue()
 
 # Called when the composition is ready
@@ -144,7 +144,7 @@ Editor.prototype._ready = ->
 # @private
 Editor.prototype._compReady = -> 
 	@compReady = true
-	Blogvio.debug.timestamp 'Blogvio.UI.Editor:_compReady'
+	Widgetic.debug.timestamp 'Widgetic.UI.Editor:_compReady'
 	@_sendMessage {t: 'ready'}
 
 # Called when the access token is updated (channel: api/token/update)
@@ -152,7 +152,7 @@ Editor.prototype._compReady = ->
 # 
 # @private
 Editor.prototype._updateToken = -> 
-	Blogvio.debug.timestamp 'Blogvio.UI.Editor:_updateToken'
+	Widgetic.debug.timestamp 'Widgetic.UI.Editor:_updateToken'
 	@_sendMessage {t: 'token', d: api.accessToken()}
 
 Editor.prototype._onConnect = -> 
@@ -164,7 +164,7 @@ Editor.prototype._onConnect = ->
 	@_ready()
 
 # Given an editor id, calls the _ready method
-# Added as a postMessage receiver in blogvio/index
+# Added as a postMessage receiver in widgetic/index
 Editor.connect = (data) -> editors[data.id]._onConnect()
 
 # Calls _trigger on an editor with the event received from the editor iframe

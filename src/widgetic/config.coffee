@@ -5,7 +5,7 @@ unless wl.origin
 parse = require './detect/parse'
 
 deriveScriptElement = ->
-	id = "blogvio_test_src"
+	id = "widgetic_test_src"
 	document.write "<script id='#{id}'></script>"
 	dummyScript = document.getElementById id
 	element 	= dummyScript.previousSibling
