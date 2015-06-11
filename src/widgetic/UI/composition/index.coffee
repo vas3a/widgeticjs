@@ -77,6 +77,12 @@ Composition = (holder, opt1, opt2 = {}) ->
 
 	@
 
+Composition.prototype.close = ->
+	comps[@id] = null
+	@_iframe.parentNode.removeChild @_iframe
+	@off()
+	@
+
 Composition.prototype.queue = (callback) ->
 	@_queue.defer (next) =>
 		callback()
@@ -159,7 +165,7 @@ Composition.prototype._trigger = (args...) ->
 	true
 
 # Add these methods to the Composition prototype to define the public API.
-# Each method id a call to _sendMessage with the respective messageType.
+# Each method is a call to _sendMessage with the respective messageType.
 # The iframe should listen to these messages and modify the widget.
 methods = {
 	'clearContent':  'cx'
@@ -170,6 +176,7 @@ methods = {
 	'setSkin':       'ss'
 	'changeSkin':    'cs'
 	'removeSkin':    'rs'
+	'saveSkin':      'sS'
 	'save':          's'
 	'saveDraft':     'sd'
 	'setName':       'sn'
