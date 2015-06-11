@@ -30,7 +30,12 @@ receivers = {
 	'r' : auth.retry
 }
 
-originRegex = ///#{config.lo.replace /(http|https)\:/, ''}|#{config.domain.replace /(http|https)\:/, ''}///
+# remove the protocol
+originRegex = "#{config.lo.replace /(http|https)\:/, ''}|#{config.domain.replace /(http|https)\:/, ''}"
+# escape the dots
+originRegex = originRegex.replace(/\./g, '\\.')
+originRegex = new RegExp(originRegex)
+
 receiver = (e) ->
 	return unless originRegex.test e.origin
 	d = e.data
@@ -87,6 +92,7 @@ Widgetic.prototype.GUID 		= require './utils/guid'
 Widgetic.prototype.pubsub    = require 'pubsub.js'
 Widgetic.prototype.require 	= require
 Widgetic.prototype.UI        = UI
+Widgetic.prototype.EVENTS    = require './constants/events'
 Widgetic.prototype.VERSION   = '@VERSION'
 Widgetic.prototype.debug     = {
 	timestamp: require './utils/timestamp'
