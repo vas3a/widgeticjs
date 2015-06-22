@@ -347,8 +347,8 @@ class Popup
 	append: (el) ->
 		el = el[0] if el.jquery
 
-		@body.innerHTML = '';
-		@body.appendChild(el)
+		@document.body.innerHTML = '';
+		@document.body.appendChild(el)
 
 		@styles = {}
 		@_updateCachedStyles(el)
@@ -378,8 +378,8 @@ class Popup
 	# Requests a resize
 	resize: =>
 		@dimensions = {
-			width:  @body.offsetWidth
-			height: @body.offsetHeight
+			width:  @document.body.offsetWidth
+			height: @document.body.offsetHeight
 			shadow: @styles['box-shadow']
 			borderRadius: @styles['border-radius']
 		}
@@ -427,8 +427,7 @@ class Popup
 	_prepare: (@window) =>
 		# save the document and important nodes
 		@document = @window.document
-		@body = @document.getElementsByTagName('body')[0]
-		@head = @document.getElementsByTagName('head')[0]
+		@head = @document.head
 
 		# load the styles
 		styles = '<style type="text/css">' + Popup.styles[@type] + '</style>'
@@ -455,7 +454,7 @@ class Popup
 			10000 # assume the css won't load if more than 10 seconds pass
 
 		return allSheetsLoaded.promise.then =>
-			@_updateCachedStyles(@body.children[0]) if @body.children[0]
+			@_updateCachedStyles(@document.body.children[0]) if @document.body.children[0]
 			@resize().then => return @
 
 	_updateCachedStyles: (el) ->
