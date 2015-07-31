@@ -54,7 +54,7 @@ api.response = (message) ->
 	if a.t is 't'
 		deffered.resolve data
 	else
-		if data.error and data.error in ['invalid_grant', 'access_denied']
+		if link.tokens and data.error and data.error in ['invalid_grant', 'access_denied']
 			# if there was an auth error, try authorizing again
 			ok = -> tokenDef = null; link.proxy prepare_message.apply @, deffered.margs
 			requestToken().then ok, (-> tokenDef = null; deffered.reject 'Unable to login again!')
