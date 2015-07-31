@@ -53,7 +53,8 @@ Composition = (holder, opt1, opt2 = {}) ->
 	query = []
 
 	client_id = auth.getClientId()
-	if options.widget_id? and not client_id
+	has_token = api.getStatus().status is 'connected'
+	if options.widget_id? and not (client_id or has_token)
 		throw new Error 'Widgetic should be initialized before using the UI.Composition!'
 
 	query.push 'access_token='+token if token = options.token or api.accessToken()
