@@ -28,6 +28,8 @@ receivers = {
 	'ee': Editor.event # editor event
 	'p' : UI.popup.receiver
 	'r' : auth.retry
+	'v' : UI.plugin.connect # plugin ready
+	've': UI.plugin.event # plugin event
 }
 
 # remove the protocol
