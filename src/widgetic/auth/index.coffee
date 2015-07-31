@@ -17,12 +17,8 @@ url = (scope=[], hash='oauth')->
 
 _get = (interactive=true, scope) ->
 	deffered = aye.defer()
-
-	unless app.id and app.uri
-		deffered.reject 'Widgetic must be initialized with client id and redirect uri!'
-		return deffered.promise
 	
-	oa = if interactive  then popup else iframe
+	oa = if interactive then popup else iframe
 
 	# remember the last requested scope and use that if not provided
 	# this allows automatic retry of `api` calls to succeed
@@ -32,15 +28,21 @@ _get = (interactive=true, scope) ->
 	link.deffered = deffered
 	{oa, scope, deffered}
 
+doAuth = (oa, url, deffered)->
+	unless app.id and app.uri
+		deffered.reject 'Widgetic must be initialized with client id and redirect uri!'
+		return deffered.promise
+
+	oa url, deffered
+
 auth = ->
 	{oa, scope, deffered} = _get arguments...
-
-	oa(url(scope),deffered)
+	doAuth oa, url(scope), deffered
 
 auth.register = (scope) ->
 	{oa, scope, deffered} = _get true, scope
 
-	oa(url(scope, 'signup'),deffered)
+	doAuth oa, url(scope, 'signup'), deffered
 
 auth.setAuthOptions = (id,uri,root)->
 	app.id = id
