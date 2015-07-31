@@ -1,6 +1,6 @@
 {
   "name": "blogviojs",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Widgetic Javascript SDK",
   "main": "lib/sdk.js",
   "scripts": {
