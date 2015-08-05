@@ -71,6 +71,18 @@ Editor.prototype.setEditorOptions = (@options = @options) ->
 	@_sendMessage {t: 'opts', d: @options}
 	@
 
+
+# Add content to dynamic content sources
+# content = {
+# 	source: 'soruce name',
+# 	data: [
+# 		item = { id, [name,] [title,] type, url }
+# 	]
+# }
+Editor.prototype.addContent = (content) ->
+	@_sendMessage {t: 'cont', d: content}
+	@
+
 # Initialize a composition save
 # The editor will save the composition only if 
 #  - the selected skin has no pending changes
