@@ -1,5 +1,5 @@
 {
-  "name": "blogviojs",
+  "name": "widgeticjs",
   "version": "0.5.7",
   "description": "Widgetic Javascript SDK",
   "main": "lib/sdk.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/blogvio/blogviojs.git"
+    "url": "https://github.com/widgetic/widgeticjs.git"
   },
   "author": "Widgetic <support@widgetic.com>",
   "contributors": [
