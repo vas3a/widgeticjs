@@ -72,6 +72,18 @@ class Plugin
 		@_sendMessage {t: 'opts', d: @options}
 		@
 
+	# Forward content to editor
+	# data = {
+	# 	editorId: 'editor frame id received through 'open-library' event',
+	# 	source: 'soruce name',
+	# 	data: [
+	# 		item = { id, [name,] [title,] type, url }
+	# 	]
+	# }
+	addEditorContent: (d) ->
+		@_sendMessage {t: 'econt', d}
+		@
+
 	# Bind an event listener
 	# Supported events are:
 	#  - composition:save
