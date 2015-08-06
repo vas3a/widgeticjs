@@ -21,7 +21,7 @@ config ={
 	editor:"#{protocol}://#{domain}/api/v2/editor.html#{o}",
 	plugin:"#{protocol}://#{host}/plugin#{o}",
 	api:"/api/v2/",
-	domain: "https://#{host}",
+	domain: "#{protocol}://#{host}",
 	lo: decodeURIComponent parse(wl).queryKey.lo or wl.origin#listen to origin
 }
 module.exports = config
