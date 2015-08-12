@@ -81,6 +81,7 @@ api.getStatus = ->
 		return {
 			status: 'connected',
 			accessToken: link.tokens.access_token
+			refreshToken: link.tokens.refresh_token
 			expiresIn: link.tokens.expires_in
 			scope: link.tokens.scope
 		}
@@ -94,6 +95,7 @@ api.accessToken = (token) ->
 
 		api.setTokens {
 			access_token: token
+			refresh_token: undefined
 			expires_in: undefined
 			scope: undefined
 		}
