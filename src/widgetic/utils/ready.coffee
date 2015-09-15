@@ -1,5 +1,5 @@
 ready = (fn) -> 
-  if document.readyState is 'complete'
+  if document.readyState in ['interactive', 'complete']
     fn()
     return
 
