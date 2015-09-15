@@ -58,7 +58,7 @@ Widgetic = ->
 	event.on win,'message',receiver
 	detect win.location.href
 	Root.style()
-	UI.parse()
+	setTimeout UI.parse
 
 # TODO: move this inside Root
 initProxy = ->
