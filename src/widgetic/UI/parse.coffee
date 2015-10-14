@@ -18,11 +18,18 @@ replaceParentWithChild = (parent) ->
 getHolder = (wrapper) ->
 	wrapper.children[0]
 
-resizeHolderTemplate = (id, styles) ->
-	"<div class=\"wdgtc-wrap\" data-wdgtc-id=\"#{ id }\" style=\"width:100%;#{ styles.wrapStyle or '' }\">
-		<div class=\"wdgtc-holder\" style=\"position:relative; padding: 0;#{ styles.holdStyle or '' }\">
-		</div>
-	</div>";
+resizeHolderTemplate = (id, styles, forIframeEmbed) ->
+	if(forIframeEmbed)
+		"<div style=\"width:100%;#{ styles.wrapStyle or '' }\">" +
+			"<div style=\"position:relative; padding: 0;#{ styles.holdStyle or '' }\">" +
+				"$$$" +
+			"</div>" +
+		"</div>"
+	else
+		"<div class=\"wdgtc-wrap\" data-wdgtc-id=\"#{ id }\" style=\"width:100%;#{ styles.wrapStyle or '' }\">
+			<div class=\"wdgtc-holder\" style=\"position:relative; padding: 0;#{ styles.holdStyle or '' }\">
+			</div>
+		</div>"
 
 stylesFactory = {
 	'fixed': (width, height) -> 
@@ -58,6 +65,15 @@ parse = -> whenReady ->
 	for el in compositionEls
 		embed(el)
 	return
+
+###
+Generates the wrapping html for the embed iframe
+###
+parse.wrapperHtml = (options, forIframeEmbed = false) ->
+	styles = stylesFactory[options.resize](options.width, options.height)
+	resizeHolderTemplate(options.composition, styles, forIframeEmbed)
+
+parse.iframeStyle = 'position:absolute;top:0;left:0;width:100%;height:100%;'
 		
 embed = (el) ->
 	options = {
@@ -72,12 +88,11 @@ embed = (el) ->
 	return unless options.composition
 	options.resize = defaultResizeStyle unless stylesFactory[options.resize]
 
-	styles = stylesFactory[options.resize](options.width, options.height)
-	el.insertAdjacentHTML('afterbegin', resizeHolderTemplate(options.id, styles))
+	el.insertAdjacentHTML('afterbegin', parse.wrapperHtml(options))
 	el = replaceParentWithChild(el)
 	holder = getHolder(el)
 	composition = new Widgetic.UI.composition(holder, options.composition, options)
-	composition._iframe.setAttribute 'style', 'position:absolute;top:0;left:0;width:100%;height:100%;'
+	composition._iframe.setAttribute 'style', parse.iframeStyle
 	# prevent flash of white while the iframe loads
 	composition._iframe.style.visibility = 'hidden'
 	composition._iframe.onload = =>
