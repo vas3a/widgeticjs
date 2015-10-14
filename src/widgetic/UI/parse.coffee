@@ -49,7 +49,7 @@ stylesFactory = {
 	'fill': (width, height) -> 
 		{
 			wrapStyle: "height: 100%"
-			holdStyle: "height: 100%"
+			holdStyle: "height: 100%;min-height:#{ height }px"
 		}
 }
 
