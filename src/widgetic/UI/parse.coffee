@@ -18,15 +18,16 @@ replaceParentWithChild = (parent) ->
 getHolder = (wrapper) ->
 	wrapper.children[0]
 
-resizeHolderTemplate = (id, styles, forIframeEmbed) ->
-	if(forIframeEmbed)
-		"<div style=\"width:100%;#{ styles.wrapStyle or '' }\">" +
+resizeHolderTemplate = (id, inline, styles, forIframeEmbed) ->
+	inlineStyle = if inline then 'display:inline-block;vertical-align:middle;' else ''
+	if forIframeEmbed
+		"<div style=\"width:100%;#{ inlineStyle }#{ styles.wrapStyle or '' }\">" +
 			"<div style=\"position:relative; padding: 0;#{ styles.holdStyle or '' }\">" +
 				"$$$" +
 			"</div>" +
 		"</div>"
 	else
-		"<div class=\"wdgtc-wrap\" data-wdgtc-id=\"#{ id }\" style=\"width:100%;#{ styles.wrapStyle or '' }\">
+		"<div class=\"wdgtc-wrap\" data-wdgtc-id=\"#{ id }\" style=\"width:100%;#{ inlineStyle }#{ styles.wrapStyle or '' }\">
 			<div class=\"wdgtc-holder\" style=\"position:relative; padding: 0;#{ styles.holdStyle or '' }\">
 			</div>
 		</div>"
@@ -71,7 +72,7 @@ Generates the wrapping html for the embed iframe
 ###
 parse.wrapperHtml = (options, forIframeEmbed = false) ->
 	styles = stylesFactory[options.resize](options.width, options.height)
-	resizeHolderTemplate(options.composition, styles, forIframeEmbed)
+	resizeHolderTemplate(options.composition, options.inline, styles, forIframeEmbed)
 
 parse.iframeStyle = 'position:absolute;top:0;left:0;width:100%;height:100%;'
 		
@@ -83,6 +84,7 @@ embed = (el) ->
 		resize: el.getAttribute('data-resize') || defaultResizeStyle
 		brand_pos: el.getAttribute('data-brand') || 'bottom-right'
 		branding: el.hasAttribute('data-branding')
+		inline: el.hasAttribute('data-inline')
 	}
 
 	return unless options.composition
