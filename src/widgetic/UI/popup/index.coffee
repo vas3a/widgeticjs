@@ -75,6 +75,18 @@ getTextFromStyleElement = (el) ->
 	catch
 		el.styleSheet.cssText
 
+clientRectToObject = (clientRect) ->
+	res = {}
+	res[key] = value for key, value of clientRect
+	return res
+
+
+_getInfo = (popupIframe) ->
+	return {
+		popup: clientRectToObject(popupIframe.getBoundingClientRect())
+		widget: clientRectToObject(popupIframe._parentFrame.getBoundingClientRect())
+	}
+
 # Handles popup management and cross-frame popup creation
 class Popup
 	# Static
@@ -146,6 +158,7 @@ class Popup
 		iframe.isVisible = false
 		# save requesting iframe as parent
 		iframe._parent = ev.source
+		iframe._parentFrame = document.getElementsByName(iframe._parent.name)[0]
 
 		document.querySelectorAll('body')[0].appendChild iframe
 		iframe.setAttribute 'src', config.popup + '&name=' + encodeURIComponent(name) + '&event=ready'
@@ -196,7 +209,8 @@ class Popup
 		iframe = @iframes[name]
 		
 		method = 'do' + ucfirst(message.d.do)
-		response = @[method]?(iframe, message.d)
+		response = @[method]?(iframe, message.d) || {}
+		response.info = _getInfo(iframe)
 
 		replyMessage(message, event, response)
 
@@ -331,6 +345,7 @@ class Popup
 		@anchor = @anchor[0] if @anchor.jquery
 
 		@dimensions = { width: 0, height: 0 }
+		@info = {}
 		@visible = false
 		@styles = {}
 
@@ -384,13 +399,19 @@ class Popup
 			borderRadius: @styles['border-radius']
 		}
 		@_sendEvent('manage', { do: 'resize', @dimensions })
+			.then @_saveInfo
 
 	# Requests for the popup to be hid
-	hide: -> @_sendEvent('manage', { do: 'hide' }).then @_hide
+	hide: -> @_sendEvent('manage', { do: 'hide' }).then(@_saveInfo).then @_hide
 	_hide: => @visible = false
 
 	# Requests for the popup to be shown
-	show: -> @position().then => @_sendEvent('manage', { do: 'show' }).then => @visible = true
+	show: -> 
+		@position()
+			.then => @_sendEvent('manage', { do: 'show' })
+			.then(@_saveInfo)
+			.then => @visible = true
+
 
 	# Requests for the popup to be positioned
 	position: => 
@@ -402,6 +423,7 @@ class Popup
 		anchor.height = parseInt @anchor.offsetHeight, 10
 
 		@_sendEvent('manage', { do: 'position', anchor, @dimensions, offset })
+			.then @_saveInfo
 
 	# Requests for the popup to be released
 	release: ->
@@ -414,6 +436,10 @@ class Popup
 		# send the release event after the reload finishes
 		setTimeout deferred.resolve, 1000
 		promise.then => @_sendEvent('manage', { do: 'release' })
+
+	_saveInfo: (response) =>
+		@info = response.info
+		return response
 
 	# Sends an event to the parent frame with the popup name info
 	_sendEvent: (event, extra) ->
