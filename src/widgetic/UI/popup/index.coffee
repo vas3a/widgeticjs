@@ -279,8 +279,7 @@ class Popup
 
 		# calculate the anchor position
 		left = window.innerWidth + document.body.scrollLeft - (anchor.left + popup.width + offset.rightMargin + offset.leftOffset)
-		left = anchor.left + offset.leftOffset + Math.min 0, left
-		left = Math.max left, anchor.left + anchor.width - popup.width
+		left = Math.max(0, anchor.left + offset.leftOffset + Math.min 0, left)
 
 		top = window.innerHeight + document.body.scrollTop - (anchor.top + anchor.height + popup.height + offset.bottomMargin)
 		top = if top >= 0 then (anchor.top + anchor.height + offset.topOffset) else (anchor.top - popup.height - offset.bottomMargin)
