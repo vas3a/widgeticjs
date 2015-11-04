@@ -5,6 +5,7 @@ unless wl.origin
 parse = require './detect/parse'
 
 domain = window.widgeticOptions?.domain || 'widgetic.com'
+domainProtocol = window.widgeticOptions?.domainProtocol || 'https'
 o = "?lo=#{encodeURIComponent wl.origin}"
 protocol = if window.widgeticOptions?.secure == false then 'http' else 'https'
 
@@ -21,7 +22,7 @@ config ={
 	editor:"#{protocol}://#{domain}/api/v2/editor.html#{o}",
 	plugin:"#{protocol}://#{host}/plugin#{o}",
 	api:"/api/v2/",
-	domain: "https://#{host}",
+	domain: "#{domainProtocol}://#{host}",
 	lo: decodeURIComponent parse(wl).queryKey.lo or wl.origin#listen to origin
 }
 module.exports = config
