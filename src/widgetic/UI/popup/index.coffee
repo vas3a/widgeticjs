@@ -159,6 +159,7 @@ class Popup
 		# save requesting iframe as parent
 		iframe._parent = ev.source
 		iframe._parentFrame = document.getElementsByName(iframe._parent.name)[0]
+		if !iframe._parentFrame then throw new Error 'Could not get the DOM element of the iframe that created the popup!'
 
 		document.querySelectorAll('body')[0].appendChild iframe
 		iframe.setAttribute 'src', config.popup + '&name=' + encodeURIComponent(name) + '&event=ready'
