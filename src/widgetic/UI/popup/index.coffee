@@ -165,7 +165,11 @@ class Popup
 		@iframes[name] = iframe
 
 		# bind on the scroll and resize events, save the handler
-		iframe.doPosition = debounce @doPosition.bind(@, iframe, null), 0
+		iframe.doPosition = =>
+			@doPosition(iframe, null)
+			msg = {t: 'p', d: {event: 'reposition', name, response: {info: _getInfo(iframe)}}}
+			send(msg, iframe._parent)
+		iframe.doPosition = debounce iframe.doPosition
 		event.on window, 'resize', iframe.doPosition
 		event.on window, 'scroll', iframe.doPosition
 
@@ -200,6 +204,10 @@ class Popup
 	# Resolves the deferred with the window object of the popup frame
 	# (which can be accessed because it's also on widgetic.com)
 	@onCreateDone: (message, event) -> ackMessage(message, event.source.frames[message.d.name])
+
+	@onReposition: (message, event) -> 
+		@popups[message.d.name].info = message.d.response.info
+		@popups[message.d.name].trigger('reposition')
 
 	# Message handler
 	# Will run in the parent frame
