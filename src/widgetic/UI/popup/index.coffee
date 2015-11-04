@@ -348,6 +348,20 @@ class Popup
 		@info = {}
 		@visible = false
 		@styles = {}
+		@_callbacks = {}
+
+	on: (ev, callback) ->
+		@_callbacks[ev] = @_callbacks[ev] || []
+		@_callbacks[ev].push(callback)
+
+	off: (ev) ->
+		if ev then return @_callbacks[ev] = []
+		@_callbacks = {}
+
+	trigger: (ev, data) ->
+		return unless @_callbacks[ev]
+		for callback in @_callbacks[ev]
+			callback(data)
 
 	# Sends a message to the parent frame to create an iframe
 	# Used in child frame
