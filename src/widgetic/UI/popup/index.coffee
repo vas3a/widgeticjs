@@ -77,6 +77,7 @@ getTextFromStyleElement = (el) ->
 
 clientRectToObject = (clientRect) ->
 	res = {}
+	return res unless clientRect
 	res[key] = value for key, value of clientRect
 	return res
 
@@ -84,7 +85,7 @@ clientRectToObject = (clientRect) ->
 _getInfo = (popupIframe) ->
 	return {
 		popup: clientRectToObject(popupIframe.getBoundingClientRect())
-		widget: clientRectToObject(popupIframe._parentFrame.getBoundingClientRect())
+		widget: clientRectToObject(popupIframe._parentFrame?.getBoundingClientRect())
 	}
 
 # Handles popup management and cross-frame popup creation
@@ -159,7 +160,6 @@ class Popup
 		# save requesting iframe as parent
 		iframe._parent = ev.source
 		iframe._parentFrame = document.getElementsByName(iframe._parent.name)[0]
-		if !iframe._parentFrame then throw new Error 'Could not get the DOM element of the iframe that created the popup!'
 
 		document.querySelectorAll('body')[0].appendChild iframe
 		iframe.setAttribute 'src', config.popup + '&name=' + encodeURIComponent(name) + '&event=ready'
