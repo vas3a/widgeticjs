@@ -20,7 +20,7 @@
   "devDependencies": {
     "aye": "git+https://github.com/cburgmer/ayepromise.git#1.1.1",
     "pubsub.js": "0.1.0",
-    "queue-async": "*",
+    "queue-async": "git+https://github.com/widgetic/queue.git#1.0.8",
     "jasmine-ajax": "git+https://github.com/pivotal/jasmine-ajax.git#master",
     "uxhr": "https://github.com/eighttrackmind/uxhr.git#master"
   }
