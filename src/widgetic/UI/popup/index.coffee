@@ -487,6 +487,12 @@ class Popup
 		styles = styles.reduce ( (previous, current) -> previous += current ), ''
 		@style(styles, true)
 
+		# copy over linked stylesheets
+		sheets = document.querySelectorAll 'link[rel="stylesheet"]'
+		cloneAndAppend = (el) =>
+			@head.appendChild el.cloneNode()
+		Array::map.call sheets, cloneAndAppend
+
 		# the popup creation is done, unless we have stylesheets to load
 		return @ unless @css
 
