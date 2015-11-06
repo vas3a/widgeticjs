@@ -159,7 +159,7 @@ class Popup
 		iframe.isVisible = false
 		# save requesting iframe as parent
 		iframe._parent = ev.source
-		iframe._parentFrame = document.getElementsByName(iframe._parent.name)[0]
+		iframe._parentFrame = document.getElementsByName(message.d.source)[0]
 
 		document.querySelectorAll('body')[0].appendChild iframe
 		iframe.setAttribute 'src', config.popup + '&name=' + encodeURIComponent(name) + '&event=ready'
@@ -376,7 +376,7 @@ class Popup
 	# Returns a promise that will be resolved
 	# when the iframe has loaded (@see @created)
 	init: ->
-		promise = @_sendEvent('create', { @type })
+		promise = @_sendEvent('create', { @type, source: window.name })
 		return promise.then(@_prepare)
 
 	# Appends an DOMElement to the popup iframe body and requests a resize
