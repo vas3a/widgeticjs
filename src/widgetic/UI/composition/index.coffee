@@ -7,6 +7,22 @@ auth   = require '../../auth'
 # Holds references to created compositions
 comps  = {}
 
+relayedEvents = [
+	'click'
+	'dblclick'
+	'mousedown'
+	'mousemove'
+	'mouseup'
+	'mouseenter'
+	'mouseleave'
+	'mouseover'
+	'mouseout'
+	'wheel'
+	'keydown'
+	'keyup'
+	'keypress'
+]
+
 # Creates an iframe for the composition in the `holder`
 # 
 # @param [Node] holder the DOM Node where we should insert the iframe
@@ -125,7 +141,10 @@ Composition.prototype._sendMessage = (message) ->
 # Bind an event listener
 # Supported events are:
 #  - composition:save
+#  - relayedEvents
 Composition.prototype.on = (ev, callback) ->
+	if ev in relayedEvents then @_sendMessage(t: 're', d: ev)
+
 	evs   = ev.split(' ')
 	calls = @hasOwnProperty('_callbacks') and @_callbacks or= {}
 	for name in evs
@@ -158,6 +177,8 @@ Composition.prototype.off = (ev, callback) ->
 # @private
 Composition.prototype._trigger = (args...) ->
 	ev = args.shift()
+	ev = args[0].type if ev is Composition.RELAY
+
 	list = @hasOwnProperty('_callbacks') and @_callbacks?[ev]
 	return unless list
 	for callback in list
@@ -196,5 +217,7 @@ Composition.connect = (id) ->
 # Calls _trigger on an editor with the event received from the editor iframe
 Composition.event = (data) -> 
 	comps[data.id]._trigger(data.e, data.d)
+
+Composition.RELAY = 'r'
 
 module.exports = Composition
