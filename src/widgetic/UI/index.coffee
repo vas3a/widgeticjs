@@ -10,4 +10,4 @@ composition = ->
 editor = ->
 	new Editor arguments...
 
-module.exports = {composition, editor, parse, popup, plugin}
+module.exports = {Composition, Editor, composition, editor, parse, popup, plugin}
