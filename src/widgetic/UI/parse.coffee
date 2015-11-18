@@ -79,8 +79,8 @@ parse.iframeStyle = 'position:absolute;top:0;left:0;width:100%;height:100%;'
 embed = (el) ->
 	options = {
 		composition: el.getAttribute('data-id')
-		width:  el.getAttribute('data-width') || 300
-		height: el.getAttribute('data-height') || 300
+		width:  el.getAttribute('data-width') || 10
+		height: el.getAttribute('data-height') || 10
 		resize: el.getAttribute('data-resize') || defaultResizeStyle
 		brand_pos: el.getAttribute('data-brand') || 'bottom-right'
 		branding: el.hasAttribute('data-branding')
