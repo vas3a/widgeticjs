@@ -89,6 +89,7 @@ Composition = (holder, opt1, opt2 = {}) ->
 	@_iframe = document.createElement 'iframe'
 	@_iframe.setAttribute 'class', 'widgetic-composition'
 	@_iframe.setAttribute 'name', @id
+	@_iframe.setAttribute 'allowfullscreen', true
 	holder.appendChild @_iframe
 	@_iframe.setAttribute 'src', url
 
