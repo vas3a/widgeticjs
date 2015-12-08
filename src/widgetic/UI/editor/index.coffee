@@ -8,6 +8,22 @@ api = require '../../api'
 # holds references to created editors
 editors = {}
 
+relayedEvents = [
+	'click'
+	'dblclick'
+	'mousedown'
+	'mousemove'
+	'mouseup'
+	'mouseenter'
+	'mouseleave'
+	'mouseover'
+	'mouseout'
+	'wheel'
+	'keydown'
+	'keyup'
+	'keypress'
+]
+
 # Creates an iframe with an editor for the composition
 # TODO: add selectSkin
 Editor = (holder, @composition, opts) ->
@@ -95,6 +111,8 @@ Editor.prototype.save = ->
 # Supported events are:
 #  - composition:save
 Editor.prototype.on = (ev, callback) ->
+	if ev in relayedEvents then @_sendMessage(t: 'ree', d: ev)
+
 	evs   = ev.split(' ')
 	calls = @hasOwnProperty('_callbacks') and @_callbacks or= {}
 	for name in evs
@@ -127,6 +145,8 @@ Editor.prototype.off = (ev, callback) ->
 # @private
 Editor.prototype._trigger = (args...) ->
 	ev = args.shift()
+	ev = args[0].type if ev is Editor.RELAY
+
 	list = @hasOwnProperty('_callbacks') and @_callbacks?[ev]
 	return unless list
 	for callback in list
@@ -181,5 +201,7 @@ Editor.connect = (data) -> editors[data.id]._onConnect()
 
 # Calls _trigger on an editor with the event received from the editor iframe
 Editor.event = (data) -> editors[data.id]._trigger(data.e, data.d)
+
+Editor.RELAY = 'er'
 
 module.exports = Editor
