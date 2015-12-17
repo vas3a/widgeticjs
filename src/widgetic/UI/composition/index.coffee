@@ -78,6 +78,7 @@ Composition = (holder, opt1, opt2 = {}) ->
 	query.push 'wait' if options.wait_editor_init
 	query.push 'branding' if options.branding
 	query.push 'bp='+options.brand_pos if options.brand_pos
+	query.push 'edit_mode' if options.edit_mode
 
 	url = url.replace /(\?)|((.)(\#)|($))/, "?#{query.join '&' if query.length}&$2" if query.length
 
@@ -220,5 +221,7 @@ Composition.event = (data) ->
 	comps[data.id]._trigger(data.e, data.d)
 
 Composition.RELAY = 'r'
+Composition.EMBED_MODE = 1
+Composition.EDIT_MODE  = 2
 
 module.exports = Composition
