@@ -96,6 +96,7 @@ Widgetic.prototype.require 	= require
 Widgetic.prototype.UI        = UI
 Widgetic.prototype.EVENTS    = require './constants/events'
 Widgetic.prototype.VERSION   = '@VERSION'
+Widgetic.prototype.parse     = detect.parse
 Widgetic.prototype.debug     = {
 	timestamp: require './utils/timestamp'
 }
