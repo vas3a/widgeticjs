@@ -33,8 +33,45 @@ loadSheet = (url, el, callback) ->
 	link.setAttribute 'type', 'text/css'
 	link.setAttribute 'charset', 'utf-8'
 	link.setAttribute 'href', url
-	event.on link, 'load', callback if callback
+
+	if callback
+		event.on link, 'load', callback
+		event.on link, 'error', callback
+
 	el.appendChild link
+
+loadSheets = (el, sheets = [], optional = []) ->
+	# we will return a promise to notify when all the stylesheets have loaded
+	def = aye.defer()
+
+	# concat all sheets together
+	allSheets = [].concat sheets, optional
+	# cache length of all sheets
+	total = allSheets.length
+
+	loadedSheets = 0
+	onLoad = (ev) =>
+		# if ev.type is loaded or the stylesheet is an optional one,
+		# increment the loadedSheets contor
+		if ev.type is 'load' or optional.indexOf(ev.target.href) > -1
+			++loadedSheets
+		# a required stylesheet has failed to load
+		# reject the promise
+		else
+			def.reject new Error "Popup could not be created because \"#{ev.target.href}\" did not load!"
+
+		# resolve the deferred if all sheets have been loaded
+		def.resolve() if loadedSheets is total
+
+	# load all stylesheets
+	loadSheet sheet, el, onLoad for sheet in allSheets
+
+	# assume the css won't load if more than 10 seconds pass
+	setTimeout def.reject.bind(
+		null, new Error('Popup could not be created because CSS did not load')
+	), 10000
+
+	def.promise
 
 defs = {}
 
@@ -489,25 +526,12 @@ class Popup
 
 		# copy over linked stylesheets
 		sheets = document.querySelectorAll 'link[rel="stylesheet"]'
-		cloneAndAppend = (el) =>
-			@head.appendChild el.cloneNode()
-		Array::map.call sheets, cloneAndAppend
+		sheets = Array::map.call sheets, (el) => el.href
 
 		# the popup creation is done, unless we have stylesheets to load
 		return @ unless @css
 
-		# we will return a promise to notify when all the stylesheets have loaded
-		allSheetsLoaded = aye.defer()
-
-		loadedSheets = 0
-		onLoad = => if ++loadedSheets is @css.length then allSheetsLoaded.resolve()
-		loadSheet sheet, @head, onLoad for sheet in @css
-		setTimeout allSheetsLoaded.reject.bind(
-				null, new Error('Popup could not be created because CSS did not load')
-			),
-			10000 # assume the css won't load if more than 10 seconds pass
-
-		return allSheetsLoaded.promise.then =>
+		loadSheets(@head, @css, sheets).then =>
 			@_updateCachedStyles(@document.body.children[0]) if @document.body.children[0]
 			@resize().then => return @
 
