@@ -1,6 +1,6 @@
 {
   "name": "widgeticjs",
-  "version": "0.5.25",
+  "version": "0.5.26",
   "description": "Widgetic Javascript SDK",
   "main": "lib/sdk.js",
   "scripts": {
