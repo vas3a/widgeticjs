@@ -528,8 +528,8 @@ class Popup
 		sheets = document.querySelectorAll 'link[rel="stylesheet"]'
 		sheets = Array::map.call sheets, (el) => el.href
 
-		# the popup creation is done, unless we have stylesheets to load
-		return @ unless @css
+		# # the popup creation is done, unless we have stylesheets to load
+		return @ unless @css or sheets.length
 
 		loadSheets(@head, @css, sheets).then =>
 			@_updateCachedStyles(@document.body.children[0]) if @document.body.children[0]
