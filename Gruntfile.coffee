@@ -53,6 +53,7 @@ module.exports 	= (grunt)->
 					]
 					postBundleCB:(err,src,next)->
 						src = src.slice(8) if src
+						src = '(function(define){'+src+'})();'
 						next(err,src)
 		copy:
 			js:
