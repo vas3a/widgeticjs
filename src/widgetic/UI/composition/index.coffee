@@ -223,5 +223,6 @@ Composition.event = (data) ->
 Composition.RELAY = 'r'
 Composition.EMBED_MODE = 1
 Composition.EDIT_MODE  = 2
+Composition.getComp = (id) -> comps[id]
 
 module.exports = Composition
