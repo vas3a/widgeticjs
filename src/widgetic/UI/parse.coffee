@@ -33,28 +33,28 @@ resizeHolderTemplate = (id, inline, styles, forIframeEmbed) ->
 		</div>"
 
 stylesFactory = {
-	'fixed': (width, height) -> 
+	'fixed': (width, height) ->
 		ratio = height * 100 / width;
 		{
 			wrapStyle: "max-width: #{ width }px; min-width: #{ width }px;"
 			holdStyle: "padding-top: #{ ratio }%;"
 		}
-	'allow-scale-down': (width, height) -> 
+	'allow-scale-down': (width, height) ->
 		ratio = height * 100 / width;
 		{
 			wrapStyle: "max-width: #{ width }px;"
 			holdStyle: "padding-top: #{ ratio }%;"
 		}
-	'fixed-height': (width, height) -> 
+	'fixed-height': (width, height) ->
 		{
 			holdStyle: "height: #{ height }px; padding-top: 0;"
 		}
-	'fill-width': (width, height) -> 
+	'fill-width': (width, height) ->
 		ratio = height * 100 / width;
 		{
 			holdStyle: "padding-top: #{ ratio }%;"
 		}
-	'fill': (width, height) -> 
+	'fill': (width, height) ->
 		{
 			wrapStyle: "height: 100%"
 			holdStyle: "height: 100%;min-height:#{ height }px"
@@ -75,7 +75,7 @@ parse.wrapperHtml = (options, forIframeEmbed = false) ->
 	resizeHolderTemplate(options.composition, options.inline, styles, forIframeEmbed)
 
 parse.iframeStyle = 'position:absolute;top:0;left:0;width:100%;height:100%;'
-		
+
 embed = (el) ->
 	options = {
 		composition: el.getAttribute('data-id')

@@ -48,7 +48,7 @@ receiver = (e) ->
 		console.warn 'Widgetic SDK: error parsing JSON:', d
 		return
 
-	try 
+	try
 		receivers[d.t]?(d, e)
 	catch error
 		console.error 'Widgetic SDK: ', error.stack
@@ -63,7 +63,7 @@ Widgetic = ->
 # TODO: move this inside Root
 initProxy = ->
 	return if hasProxy
-	create = => 
+	create = =>
 		(@root = new Root()).createProxy()
 		hasProxy = true
 	if document.getElementsByTagName('body')[0]

@@ -24,7 +24,7 @@ relayedEvents = [
 ]
 
 # Creates an iframe for the composition in the `holder`
-# 
+#
 # @param [Node] holder the DOM Node where we should insert the iframe
 # @param [String, Object] data a composition ID or a new composition
 # @example `data` as a new composition
@@ -108,14 +108,14 @@ Composition.prototype.queue = (callback) ->
 		next()
 
 # Starts the message queue. Called when the iframe is loaded.
-# 
+#
 # @private
 Composition.prototype._ready = ->
 	Widgetic.debug.timestamp 'Widgetic.UI.Composition:_ready'
 	@_startQueue()
 
 # Adds a postMessage to the queue
-# 
+#
 # @param [Object] message an object with a message type and data
 # @example A message
 # 	{
@@ -135,7 +135,7 @@ Composition.prototype._ready = ->
 # 	}
 # @private
 Composition.prototype._sendMessage = (message) ->
-	@_queue.defer (next) => 
+	@_queue.defer (next) =>
 		@_iframe.contentWindow.postMessage JSON.stringify(message), '*'
 		next()
 	@
@@ -155,7 +155,7 @@ Composition.prototype.on = (ev, callback) ->
 	@
 
 # Unbind an event listener
-Composition.prototype.off = (ev, callback) ->	
+Composition.prototype.off = (ev, callback) ->
 	if arguments.length is 0
 		@_callbacks = {}
 		return @
@@ -175,7 +175,7 @@ Composition.prototype.off = (ev, callback) ->
 	@
 
 # Trigger an event
-# 
+#
 # @private
 Composition.prototype._trigger = (args...) ->
 	ev = args.shift()
@@ -217,7 +217,7 @@ Composition.connect = (id) ->
 	comps[id.d]._ready()
 
 # Calls _trigger on an editor with the event received from the editor iframe
-Composition.event = (data) -> 
+Composition.event = (data) ->
 	comps[data.id]._trigger(data.e, data.d)
 
 Composition.RELAY = 'r'
