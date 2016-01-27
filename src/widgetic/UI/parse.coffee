@@ -85,6 +85,7 @@ embed = (el) ->
 		brand_pos: el.getAttribute('data-brand') || 'bottom-right'
 		branding: el.hasAttribute('data-branding')
 		inline: el.hasAttribute('data-inline')
+		autoscale: el.getAttribute('data-autoscale') || 'on'
 	}
 
 	return unless options.composition

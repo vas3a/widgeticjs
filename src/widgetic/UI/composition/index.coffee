@@ -79,6 +79,8 @@ Composition = (holder, opt1, opt2 = {}) ->
 	query.push 'branding' if options.branding
 	query.push 'bp='+options.brand_pos if options.brand_pos
 	query.push 'edit_mode' if options.edit_mode
+	query.push 'resize=' + options.resize if options.resize
+	query.push 'autoscale=' + options.autoscale if options.autoscale
 
 	url = url.replace /(\?)|((.)(\#)|($))/, "?#{query.join '&' if query.length}&$2" if query.length
 
@@ -93,8 +95,16 @@ Composition = (holder, opt1, opt2 = {}) ->
 	@_iframe.setAttribute 'allowfullscreen', true
 	holder.appendChild @_iframe
 	@_iframe.setAttribute 'src', url
-
+	# TODO needs rewrite
+	@_responsiveWrapper = @_iframe.parentElement.parentElement if @_iframe.parentElement.parentElement.className.indexOf('wdgtc-wrap') is 0
+	@_autoscale = options.autoscale isnt 'off'
 	@
+
+Composition.prototype.updateSize = (width, height) ->
+	return if !@_autoscale
+	@_responsiveWrapper.style.minHeight = height + 'px' if @_responsiveWrapper and height
+	@_iframe.style.height = height + 'px' if height
+	@_iframe.setAttribute 'width', width if width
 
 Composition.prototype.close = ->
 	comps[@id] = null
@@ -219,6 +229,9 @@ Composition.connect = (id) ->
 # Calls _trigger on an editor with the event received from the editor iframe
 Composition.event = (data) ->
 	comps[data.id]._trigger(data.e, data.d)
+
+Composition.updateSize = (data) ->
+	comps[data.id].updateSize(data.d.width, data.d.height)
 
 Composition.RELAY = 'r'
 Composition.EMBED_MODE = 1

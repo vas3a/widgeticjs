@@ -30,6 +30,7 @@ receivers = {
 	'r' : auth.retry
 	'v' : UI.plugin.connect # plugin ready
 	've': UI.plugin.event # plugin event
+	'su': Composition.updateSize
 }
 
 # remove the protocol
