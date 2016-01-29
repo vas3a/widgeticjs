@@ -241,7 +241,17 @@ class Popup
 	# Called when the popup iframe is ready
 	# Resolves the deferred with the window object of the popup frame
 	# (which can be accessed because it's also on widgetic.com)
-	@onCreateDone: (message, event) -> ackMessage(message, event.source.frames[message.d.name])
+	@onCreateDone: (message, event) -> 
+		{source} = event
+		# if frame wasn't found in event's source frames
+		# try looking for it in parents frames
+		unless popupFrame = source.frames[message.d.name]
+			# iterate 'till top frame
+			while source isnt event.source.top
+				source = source.parent
+				try break if popupFrame = source.frames[message.d.name]
+
+		ackMessage(message, popupFrame)
 
 	@onReposition: (message, event) -> 
 		@popups[message.d.name].info = message.d.response.info
@@ -528,8 +538,8 @@ class Popup
 		sheets = document.querySelectorAll 'link[rel="stylesheet"]'
 		sheets = Array::map.call sheets, (el) => el.href
 
-		# the popup creation is done, unless we have stylesheets to load
-		return @ unless @css
+		# # the popup creation is done, unless we have stylesheets to load
+		return @ unless @css or sheets.length
 
 		loadSheets(@head, @css, sheets).then =>
 			@_updateCachedStyles(@document.body.children[0]) if @document.body.children[0]

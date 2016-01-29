@@ -33,6 +33,7 @@ receivers = {
 	'r' : auth.retry
 	'v' : UI.plugin.connect # plugin ready
 	've': UI.plugin.event # plugin event
+	'su': Composition.updateSize
 }
 
 # remove the protocol
@@ -107,7 +108,7 @@ Widgetic = ->
 # TODO: move this inside Root
 initProxy = ->
 	return if hasProxy
-	create = => 
+	create = =>
 		(@root = new Root()).createProxy()
 		hasProxy = true
 	if document.getElementsByTagName('body')[0]
