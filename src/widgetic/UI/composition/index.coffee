@@ -224,14 +224,14 @@ for method, messageType of methods
 # This method is defined in widgetic\index as a receiver for the 'u' event
 # type, which is sent by the Composition's iframe when finished loading.
 Composition.connect = (id) ->
-	comps[id.d]._ready()
+	comps[id.d]?._ready()
 
 # Calls _trigger on an editor with the event received from the editor iframe
 Composition.event = (data) ->
 	comps[data.id]._trigger(data.e, data.d)
 
 Composition.updateSize = (data) ->
-	comps[data.id].updateSize(data.d.width, data.d.height)
+	comps[data.id]?.updateSize(data.d.width, data.d.height)
 
 Composition.RELAY = 'r'
 Composition.EMBED_MODE = 1

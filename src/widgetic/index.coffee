@@ -20,6 +20,11 @@ winP        = win.parent
 
 hasProxy    = false
 
+resizeFrame = (data) ->
+	ifr = document.querySelector "[name=\"#{data.d.source}\"]"
+	ifr or= document.querySelector "[name=\"#{data.id}\"]"
+	ifr.parentElement.style.height = data.d.height+'px'
+
 receivers = {
 	'a' : api.request  # api
 	'e' : api.response # event
@@ -33,7 +38,7 @@ receivers = {
 	'r' : auth.retry
 	'v' : UI.plugin.connect # plugin ready
 	've': UI.plugin.event # plugin event
-	'su': Composition.updateSize
+	'su': resizeFrame
 }
 
 # remove the protocol
@@ -76,7 +81,7 @@ callReceiver = (e, data) ->
 	# should pass the event forward (proxy message)
 	# if the event type is popup and either source is window.parent 
 	# or the event comes from the composition and it's target is a popup
-	if isProxy = data.t is 'p' and (e.source is winP or Composition.getComp(data.d.source or sourceName))
+	if isProxy = data.t in ['p', 'su'] and (e.source is winP or Composition.getComp(data.d.source or sourceName))
 		return proxyReceiver(e, data)
 
 	unless (receiver = receivers[data.t])?
