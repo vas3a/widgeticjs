@@ -24,5 +24,6 @@ config ={
 	api:"/api/v2/",
 	domain: "#{domainProtocol}://#{host}",
 	lo: decodeURIComponent parse(wl).queryKey.lo or wl.origin#listen to origin
+	crossdomain: if window.widgeticOptions.crossdomain != null then window.widgeticOptions.crossdomain else true
 }
 module.exports = config
