@@ -21,34 +21,43 @@ Root = ->
 
 	@
 
+proxyCreated = aye.defer()
+
 Root.prototype.createProxy = ->
 	if steps.init
-		proxy 	= document.createElement 'iframe'
-		@el.appendChild proxy
-		fail  = ->
-			Root._done = null
-			clearTimeout timeout
-			console.error 'Could not initialize iframe'
+		if config.crossdomain
+			proxy 	= document.createElement 'iframe'
+			@el.appendChild proxy
+			fail  = ->
+				Root._done = null
+				clearTimeout timeout
+				proxyCreated.reject(new Error('Could not initialize cross-domain messaging iframe'))
 
-		timeout = setTimeout  fail,10000
+			timeout = setTimeout  fail,10000
 
-		Root._done = ->
-			api.setProxy (message)->proxy.contentWindow.postMessage message, config.domain
-			
-			clearTimeout timeout
+			Root._done = ->
+				api.setProxy (message) -> proxy.contentWindow.postMessage message, config.domain
+
+				clearTimeout timeout
+				steps.init()
+				Root._done = steps.init = null
+				proxyCreated.resolve()
+
+			proxy.setAttribute 'src', config.proxy
+		else
+			api.setProxy (message) -> window.widgeticReceiver({origin: window.location.origin, data: message})
 			steps.init()
 			Root._done = steps.init = null
-			
-		proxy.setAttribute 'src', config.proxy
+			proxyCreated.resolve()
 
-	@
+	proxyCreated.promise
 
 Root.connect = ->
 	Root._done?()
 
 Root.style = ->
 	head = document.getElementsByTagName('head')[0]
-	
+
 	head.appendChild style = document.createElement('style')
 	style.textContent = css
 

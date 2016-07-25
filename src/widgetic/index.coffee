@@ -15,6 +15,8 @@ Composition = require './UI/composition'
 Editor      = require './UI/editor'
 UI          = require './UI'
 
+aye 	= require 'aye'
+
 win         = window
 winP        = win.parent
 
@@ -110,17 +112,20 @@ Widgetic = ->
 	Root.style()
 	setTimeout UI.parse
 
+proxyInitialized = aye.defer()
 # TODO: move this inside Root
 initProxy = ->
-	return if hasProxy
-	create = =>
-		(@root = new Root()).createProxy()
-		hasProxy = true
-	if document.getElementsByTagName('body')[0]
-		create()
-	else
-		whenReady create
-
+	if !hasProxy
+		create = =>
+			(@root = new Root()).createProxy()
+				.then(-> proxyInitialized.resolve())
+				.fail((e) -> proxyInitialized.reject(e))
+			hasProxy = true
+		if document.getElementsByTagName('body')[0]
+			create()
+		else
+			whenReady create
+	return proxyInitialized.promise
 
 Widgetic.prototype.init = (client_id, redirect_uri) ->
 	initProxy()
@@ -128,8 +133,12 @@ Widgetic.prototype.init = (client_id, redirect_uri) ->
 	auth.setAuthOptions client_id,redirect_uri
 	@
 
-Widgetic.prototype.api        = -> initProxy(); return api.apply @, arguments
-Widgetic.prototype.auth       = -> auth.apply @, arguments
+Widgetic.prototype.api = ->
+	args = arguments
+	return initProxy()
+		.then(-> return api.apply @, args)
+
+Widgetic.prototype.auth = -> auth.apply @, arguments
 Widgetic.prototype.auth.register = -> auth.register.apply @, arguments
 Widgetic.prototype.auth.status = -> api.getStatus.apply @, arguments
 Widgetic.prototype.auth.token  = -> api.accessToken.apply @, arguments

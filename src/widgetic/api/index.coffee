@@ -15,7 +15,7 @@ tknDelay=null
 
 prepare_message = (url,method,data,id) ->
 	url = config.api + url
-	access_token = link.tokens?.access_token or false 
+	access_token = link.tokens?.access_token or false
 	if (method or= 'GET') instanceof Object
 		data = method
 		method = 'GET'
@@ -33,10 +33,10 @@ api = (url,method,data) ->
 	# TODO: reject the promise if not authorized
 	id 	= guid()
 	promise = (defs[id] = deffered = aye.defer()).promise
-	queue.defer (next) =>
-		message = prepare_message.apply @, deffered.margs = [url,method, data, id]
-		promise.then advance=(->defs[id] = null or next()),advance
-		link.proxy message
+	message = prepare_message.apply @, deffered.margs = [url,method, data, id]
+	advance = () -> defs[id] = null
+	promise.then advance, advance
+	link.proxy message
 	promise
 
 api.response = (message) ->
@@ -48,7 +48,7 @@ api.response = (message) ->
 		try
 			data = json.parse(data)
 		catch
-			deffered.reject  "JSON Parse error!"
+			deffered.reject new Error("JSON Parse error!")
 			return
 
 	if a.t is 't'
@@ -57,9 +57,9 @@ api.response = (message) ->
 		if link.tokens and data.error and data.error in ['invalid_grant', 'access_denied']
 			# if there was an auth error, try authorizing again
 			ok = -> tokenDef = null; link.proxy prepare_message.apply @, deffered.margs
-			requestToken().then ok, (-> tokenDef = null; deffered.reject 'Unable to login again!')
+			requestToken().then ok, (-> tokenDef = null; deffered.reject new Error('Unable to login again!'))
 		else
-			deffered.reject data
+			deffered.reject new Error(data.error_description)
 
 requestToken = ->
 	return auth false if (auth = require '../auth/index').getClientId()?
@@ -76,7 +76,7 @@ api.setTokens = (tokens) ->
 	link.tokens = tokens
 	pubsub.publish 'api/token/update'
 
-api.getStatus = -> 
+api.getStatus = ->
 	if link.tokens?.access_token
 		return {
 			status: 'connected',
@@ -88,7 +88,7 @@ api.getStatus = ->
 	else
 		return { status: 'disconnected'}
 
-api.accessToken = (token) -> 
+api.accessToken = (token) ->
 	if token
 		clearTimeout tknDelay
 		tokenDef?.resolve token
@@ -99,10 +99,10 @@ api.accessToken = (token) ->
 			expires_in: undefined
 			scope: undefined
 		}
-	
+
 	link.tokens?.access_token
 
-api.disconnect = ->	
+api.disconnect = ->
 	# TODO: invalidate the token
 	pubsub.publish 'api/token/update'
 	link.tokens = null
