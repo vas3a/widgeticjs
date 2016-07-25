@@ -33,10 +33,10 @@ api = (url,method,data) ->
 	# TODO: reject the promise if not authorized
 	id 	= guid()
 	promise = (defs[id] = deffered = aye.defer()).promise
-	queue.defer (next) =>
-		message = prepare_message.apply @, deffered.margs = [url,method, data, id]
-		promise.then advance=(->defs[id] = null or next()),advance
-		link.proxy message
+	message = prepare_message.apply @, deffered.margs = [url,method, data, id]
+	advance = () -> defs[id] = null
+	promise.then advance, advance
+	link.proxy message
 	promise
 
 api.response = (message) ->
