@@ -59,7 +59,10 @@ api.response = (message) ->
 			ok = -> tokenDef = null; link.proxy prepare_message.apply @, deffered.margs
 			requestToken().then ok, (-> tokenDef = null; deffered.reject new Error('Unable to login again!'))
 		else
-			deffered.reject new Error(data.error_description)
+			e = new Error(data.error_description || data.message || 'Unknown Error')
+			e.errors = data.errors
+			e.code = data.code
+			deffered.reject e
 
 requestToken = ->
 	return auth false if (auth = require '../auth/index').getClientId()?
