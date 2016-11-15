@@ -14,9 +14,9 @@ extend = (out = {}) ->
 
 	return out
 
-debounce = (fn, t = 10) -> 
+debounce = (fn, t = 10) ->
 	_delay = null
-	-> 
+	->
 		clearTimeout _delay
 		_delay = setTimeout fn, t
 
@@ -40,38 +40,31 @@ loadSheet = (url, el, callback) ->
 
 	el.appendChild link
 
-loadSheets = (el, sheets = [], optional = []) ->
-	# we will return a promise to notify when all the stylesheets have loaded
-	def = aye.defer()
-
-	# concat all sheets together
+loadSheets = (el, sheets = [], optional = [], callback) ->
 	allSheets = [].concat sheets, optional
-	# cache length of all sheets
 	total = allSheets.length
 
 	loadedSheets = 0
+	waiting = true
 	onLoad = (ev) =>
 		# if ev.type is loaded or the stylesheet is an optional one,
-		# increment the loadedSheets contor
+		# increment the loadedSheets counter
 		if ev.type is 'load' or optional.indexOf(ev.target.href) > -1
 			++loadedSheets
-		# a required stylesheet has failed to load
-		# reject the promise
 		else
-			def.reject new Error "Popup could not be created because \"#{ev.target.href}\" did not load!"
+			# a required stylesheet has failed to load
+			# reject the promise
+			console.log new Error "Popup stylesheet \"#{ev.target.href}\" did not load!"
 
-		# resolve the deferred if all sheets have been loaded
-		def.resolve() if loadedSheets is total
+		# resolve the deferred if all sheets have been loaded or no longer waiting
+		callback() if loadedSheets is total or !waiting
 
 	# load all stylesheets
 	loadSheet sheet, el, onLoad for sheet in allSheets
 
-	# assume the css won't load if more than 10 seconds pass
-	setTimeout def.reject.bind(
-		null, new Error('Popup could not be created because CSS did not load')
-	), 10000
-
-	def.promise
+	# assume the css won't load if more than 5 seconds pass, stop waiting for the rest of the css
+	setTimeout callback, 5000
+	setTimeout (-> waiting = false), 5000
 
 defs = {}
 
@@ -102,7 +95,7 @@ getCssValue = (el, property) ->
 	value = window
 		.getComputedStyle(el)
 		.getPropertyValue(property)
-	
+
 	return undefined unless value
 	return value
 
@@ -138,6 +131,48 @@ class Popup
 				overflow:hidden;
 				background:transparent !important
 			}
+
+			#loader {
+				width: 250px;
+				height: 250px;
+				border: 1px solid #d5d5d5;
+				background: white;
+			}
+
+			.sk-three-bounce {
+				margin: 115px auto;
+				width: 40px;
+				text-align: center; }
+				.sk-three-bounce .sk-child {
+					width: 10px;
+					height: 10px;
+					background-color: #262424;
+					border-radius: 100%;
+					display: inline-block;
+					-webkit-animation: sk-three-bounce 1.4s ease-in-out 0s infinite both;
+									animation: sk-three-bounce 1.4s ease-in-out 0s infinite both; }
+				.sk-three-bounce .sk-bounce1 {
+					-webkit-animation-delay: -0.32s;
+									animation-delay: -0.32s; }
+				.sk-three-bounce .sk-bounce2 {
+					-webkit-animation-delay: -0.16s;
+									animation-delay: -0.16s; }
+
+			@-webkit-keyframes sk-three-bounce {
+				0%, 80%, 100% {
+					-webkit-transform: scale(0);
+									transform: scale(0); }
+				40% {
+					-webkit-transform: scale(1);
+									transform: scale(1); } }
+
+			@keyframes sk-three-bounce {
+				0%, 80%, 100% {
+					-webkit-transform: scale(0);
+									transform: scale(0); }
+				40% {
+					-webkit-transform: scale(1);
+									transform: scale(1); } }
 		'
 		overlay: '
 			html, body {
@@ -229,7 +264,7 @@ class Popup
 	# Acknowledges the message with the response sent from the parent frame
 	# The handling of the event replies can be customized by creating
 	# a method called "on{EventName}Done"
-	@onDone: (message, event) -> 
+	@onDone: (message, event) ->
 		method = message.d.original
 		method = 'on' + ucfirst(method) + 'Done'
 		return @[method](message, event) if @[method]
@@ -241,7 +276,7 @@ class Popup
 	# Called when the popup iframe is ready
 	# Resolves the deferred with the window object of the popup frame
 	# (which can be accessed because it's also on widgetic.com)
-	@onCreateDone: (message, event) -> 
+	@onCreateDone: (message, event) ->
 		{source} = event
 		# if frame wasn't found in event's source frames
 		# try looking for it in parents frames
@@ -253,7 +288,7 @@ class Popup
 
 		ackMessage(message, popupFrame)
 
-	@onReposition: (message, event) -> 
+	@onReposition: (message, event) ->
 		@popups[message.d.name].info = message.d.response.info
 		@popups[message.d.name].trigger('reposition')
 
@@ -263,7 +298,7 @@ class Popup
 	@onManage: (message, event) ->
 		name = message.d.name
 		iframe = @iframes[name]
-		
+
 		method = 'do' + ucfirst(message.d.do)
 		response = @[method]?(iframe, message.d) || {}
 		response.info = _getInfo(iframe)
@@ -283,7 +318,7 @@ class Popup
 		return options.dimensions
 
 	# Hides an iframe
-	@doHide: (iframe, options) -> 
+	@doHide: (iframe, options) ->
 		iframe.isVisible = false
 		iframe.style.display = 'none'
 		return
@@ -332,7 +367,7 @@ class Popup
 		top = window.innerHeight + document.body.scrollTop - (anchor.top + anchor.height + popup.height + offset.bottomMargin)
 		top = if top >= 0 then (anchor.top + anchor.height + offset.topOffset) else (anchor.top - popup.height - offset.bottomMargin)
 		if top < 0 then top = anchor.top + anchor.height + offset.topOffset
-		
+
 		iframe.style.top = top + 'px'
 		iframe.style.left = left + 'px'
 		return
@@ -341,7 +376,7 @@ class Popup
 	@doRelease: (iframe, options) ->
 		# remove the iframe from the DOM
 		iframe.parentNode.removeChild iframe
-		
+
 		# unbind the events
 		event.off window, 'resize', iframe.doPosition
 		event.off window, 'scroll', iframe.doPosition
@@ -357,7 +392,7 @@ class Popup
 	@hideAll: ->
 		iframes = for id, iframe of Popup.iframes
 			iframe
-		
+
 		# close visible iframes
 		iframes.filter((iframe) -> iframe.isVisible)
 			.map (iframe) ->
@@ -368,7 +403,7 @@ class Popup
 	# Message handler
 	# Will run in the child frame
 	# Triggered by Popup.hideAll
-	# @example message format: 
+	# @example message format:
 	#	{
 	#		t: "p", #popup channel
 	#		d: {
@@ -396,13 +431,12 @@ class Popup
 		for key, value of @options
 			@[key] = value
 
-		@anchor ?= document.body		
+		@anchor ?= document.body
 		@anchor = @anchor[0] if @anchor.jquery
 
 		@dimensions = { width: 0, height: 0 }
 		@info = {}
 		@visible = false
-		@styles = {}
 		@_callbacks = {}
 
 	on: (ev, callback) ->
@@ -431,11 +465,8 @@ class Popup
 	append: (el) ->
 		el = el[0] if el.jquery
 
-		@document.body.innerHTML = '';
-		@document.body.appendChild(el)
-
-		@styles = {}
-		@_updateCachedStyles(el)
+		@content.innerHTML = '';
+		@content.appendChild(el)
 
 		return @resize()
 
@@ -451,7 +482,7 @@ class Popup
 		catch
 			@styleElement.styleSheet.cssText = @preservedStyles + text
 
-		@preservedStyles += text if preserve 
+		@preservedStyles += text if preserve
 
 		# send a resolved deferred to keep the API consistent
 		deferred = aye.defer()
@@ -464,8 +495,6 @@ class Popup
 		@dimensions = {
 			width:  @document.body.offsetWidth
 			height: @document.body.offsetHeight
-			shadow: @styles['box-shadow']
-			borderRadius: @styles['border-radius']
 		}
 		@_sendEvent('manage', { do: 'resize', @dimensions })
 			.then @_saveInfo
@@ -475,7 +504,7 @@ class Popup
 	_hide: => @visible = false
 
 	# Requests for the popup to be shown
-	show: -> 
+	show: ->
 		@position()
 			.then => @_sendEvent('manage', { do: 'show' })
 			.then(@_saveInfo)
@@ -483,7 +512,7 @@ class Popup
 
 
 	# Requests for the popup to be positioned
-	position: => 
+	position: =>
 		offset = { @topOffset, @leftOffset, @bottomMargin, @rightMargin }
 
 		anchor = getOffset(@anchor)
@@ -524,6 +553,18 @@ class Popup
 		@document = @window.document
 		@head = @document.head
 
+		@loader = document.createElement('div')
+		@loader.id = 'loader'
+		@loader.style.display = 'none'
+		@loader.innerHTML = '<div class="sk-three-bounce">
+				<div class="sk-child sk-bounce1"></div>
+				<div class="sk-child sk-bounce2"></div>
+				<div class="sk-child sk-bounce3"></div>
+			</div>'
+		@document.body.appendChild(@loader)
+		@content = document.createElement('div')
+		@document.body.appendChild(@content)
+
 		# load the styles
 		styles = '<style type="text/css">' + Popup.styles[@type] + '</style>'
 		@head.insertAdjacentHTML 'beforeend', styles
@@ -535,24 +576,21 @@ class Popup
 		@style(styles, true)
 
 		# copy over linked stylesheets
+		# TODO remove this, as it does not make sense in the general case
 		sheets = document.querySelectorAll 'link[rel="stylesheet"]'
 		sheets = Array::map.call sheets, (el) => el.href
 
-		# # the popup creation is done, unless we have stylesheets to load
-		return @ unless @css or sheets.length
+		if @css or sheets.length
+			@loader.style.display = 'block'
+			@content.style.display = 'none'
+			loadSheets @head, @css, sheets, =>
+				@loader.style.display = 'none'
+				@content.style.display = 'block'
+				@resize()
+					.then => @position()
+					.then => return @
 
-		loadSheets(@head, @css, sheets).then =>
-			@_updateCachedStyles(@document.body.children[0]) if @document.body.children[0]
-			@resize().then => return @
-
-	_updateCachedStyles: (el) ->
-		return unless @copyStyles
-		@_cacheStyle(el, 'box-shadow')
-		# TODO: check what's happening to border-radius on firefox (missing)
-		@_cacheStyle(el, 'border-radius')
-
-	_cacheStyle: (el, value) -> 
-		@styles[value] = getCssValue(el, value)
+		return @
 
 # listen for clicks to hide popups
 event.on window.document, 'click', Popup.hideAll
