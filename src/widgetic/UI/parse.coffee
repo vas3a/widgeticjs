@@ -76,6 +76,7 @@ parseShortcodes = ->
 		return '<a href="https://widgetic.com/widget/' + widget + '/" class="widgetic-composition" ' + htmlAttributes + '></a>'
 
 	for parentEl in document.querySelectorAll("body, body *")
+		continue if parentEl.nodeName in ['HEAD', 'META', 'LINK', 'SCRIPT', 'TITLE']
 		children = parentEl.childNodes
 
 		for el in children
