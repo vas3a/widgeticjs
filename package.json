@@ -1,5 +1,5 @@
 {
-  "name": "widgeticjs",
+  "name": "@widgetic/sdk",
   "version": "0.6.4",
   "description": "Widgetic Javascript SDK",
   "main": "lib/sdk.js",
