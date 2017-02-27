@@ -102,8 +102,6 @@ parse.wrapperHtml = (options, forIframeEmbed = false) ->
 	styles = stylesFactory[options.resize](options.width, options.height)
 	resizeHolderTemplate(options.composition, options.inline, styles, forIframeEmbed)
 
-parse.iframeStyle = 'position:absolute;top:0;left:0;width:100%;height:100%;'
-
 embed = (el) ->
 	options = {
 		composition: el.getAttribute('data-id')
@@ -122,11 +120,7 @@ embed = (el) ->
 	el.insertAdjacentHTML('afterbegin', parse.wrapperHtml(options))
 	el = replaceParentWithChild(el)
 	holder = getHolder(el)
+	options.iframeStyle = 'position:absolute;top:0;left:0;width:100%;height:100%;'
 	composition = new Widgetic.UI.composition(holder, options.composition, options)
-	composition._iframe.setAttribute 'style', parse.iframeStyle
-	# prevent flash of white while the iframe loads
-	composition._iframe.style.visibility = 'hidden'
-	composition._iframe.onload = =>
-		composition._iframe.style.visibility = 'visible'
 
 module.exports = parse

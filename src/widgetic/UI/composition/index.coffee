@@ -93,6 +93,11 @@ Composition = (holder, opt1, opt2 = {}) ->
 	@_iframe.setAttribute 'class', 'widgetic-composition'
 	@_iframe.setAttribute 'name', @id
 	@_iframe.setAttribute 'allowfullscreen', true
+	@_iframe.setAttribute 'style', options.iframeStyle if options.iframeStyle
+	# prevent flash of white while the iframe loads
+	@_iframe.style.visibility = 'hidden'
+	@_iframe.onload = =>
+		@_iframe.style.visibility = 'visible'
 	holder.appendChild @_iframe
 	@_iframe.setAttribute 'src', url
 	# TODO needs rewrite
